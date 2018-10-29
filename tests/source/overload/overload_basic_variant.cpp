@@ -1,9 +1,9 @@
-#include <catch2/catch.hpp>
-
 #include <phd/overload/overload.hpp>
 
 #include <tests/classes.hpp>
 #include <tests/functions.hpp>
+
+#include <catch2/catch.hpp>
 
 #include <variant>
 #include <memory>
@@ -61,8 +61,8 @@ TEST_CASE("phd/overload/variant/lambdas", "overload can handle non-template lamb
 		auto ovr = phd::overload(
 			[](int) { return 0; },
 			[](std::string) mutable { return 2; });
-		std::variant<int, double, std::string> v0(2);
-		std::variant<int, double, std::string> v2("bark");
+		std::variant<int, std::string> v0(2);
+		std::variant<int, std::string> v2("bark");
 
 		int v0_select = std::visit(ovr, v0);
 		REQUIRE(v0_select == 0);
@@ -133,7 +133,6 @@ TEST_CASE("phd/overload/variant/virtual member functions", "overload can handle 
 			&my_derived_class::s_to_i);
 		std::variant<my_derived_class> v_obj(my_derived_class{});
 		std::variant<int, std::string> v0(2);
-		std::variant<int, std::string> v1(3.5);
 		std::variant<int, std::string> v2("bark");
 
 		int v0_select = std::visit(ovr, v_obj, v0);

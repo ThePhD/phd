@@ -1,6 +1,19 @@
 set(phd_test_sources
-	"source/overload_basic.cpp"
-	"source/overload_basic_variant.cpp"
+	"source/out_ptr/clever_out_ptr_test.cpp"
+	"source/out_ptr/simple_out_ptr_test.cpp"
+	"source/out_ptr/out_ptr_test.cpp"
+	"source/out_ptr/customized_out_ptr_test.cpp"
+	"source/out_ptr/custom_unique_deleter_test.cpp"
+
+	"source/out_ptr/clever_inout_ptr_test.cpp"
+	"source/out_ptr/simple_inout_ptr_test.cpp"
+	"source/out_ptr/inout_ptr_test.cpp"
+	"source/out_ptr/customized_inout_ptr_test.cpp"
+
+	"source/handle/handle_test.cpp"
+
+	"source/overload/overload_basic.cpp"
+	"source/overload/overload_basic_variant.cpp"
 
 	"source/classes.cpp"
 	"source/functions.cpp"
@@ -23,6 +36,6 @@ target_include_directories(phd_test
 	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 	"${CMAKE_SOURCE_DIR}/vendor/catch2/single_include")
 target_link_libraries(phd_test 
-	PRIVATE phd::phd ${CMAKE_DL_LIBS}
+	PRIVATE phd::phd ficapi ${CMAKE_DL_LIBS}
 )
 add_test(NAME phd_test COMMAND phd_test)

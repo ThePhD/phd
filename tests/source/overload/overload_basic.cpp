@@ -1,9 +1,9 @@
-#include <catch2/catch.hpp>
-
 #include <phd/overload/overload.hpp>
 
 #include <tests/classes.hpp>
 #include <tests/functions.hpp>
+
+#include <catch2/catch.hpp>
 
 #include <variant>
 #include <memory>

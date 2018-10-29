@@ -69,7 +69,9 @@
 	"cmake.autoRestartBuild": true,
 	"cmake.saveBeforeBuild": true,
 	"cmake.configureSettings": {
-		"PHD_TESTS": "true"
+		"PHD_TESTS": "true",
+		"PHD_BENCHMARKS": "true",
+		"PHD_EXAMPLES": "true"
 	},
 	"C_Cpp.configurationWarnings": "Disabled"
 }

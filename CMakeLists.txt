@@ -61,6 +61,10 @@ set_target_properties(phd
 )
 
 # # Benchmarks, Tests, Examples
+if (PHD_TESTS OR PHD_BENCHMARKS)
+	enable_testing()
+	add_subdirectory(vendor/ficapi)
+endif()
 if (PHD_TESTS)
 	enable_testing()
 	add_subdirectory(tests)

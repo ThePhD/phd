@@ -1,4 +1,3 @@
-
 #define CATCH_CONFIG_RUNNER 1
 #include <catch2/catch.hpp>
 
