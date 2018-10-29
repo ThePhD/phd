@@ -14,19 +14,19 @@ If you want to build the tests or benchmarks, pass `-DOUT_PTR_BENCHMARKS=ON` and
 
 ## Benchmarks
 
-`out_ptr benchmarks` for testing how efficient the library may or may not be by employing some clever tricks. You can run these benchmarks and report the results in an issue request, e-mail, or anywhere else you can find and emssage me. I would certainly appreciate any tips, tricks, pointers and other tidbits about how to write the benchmarks or if there are other cases I am not considering.
+`out_ptr benchmarks` for testing how efficient the library may or may not be by employing some clever tricks. You can run these benchmarks and report the results in an issue request, e-mail, or anywhere else you can find and message me. I would certainly appreciate any tips, tricks, pointers and other tidbits about how to write the benchmarks or if there are other cases I am not considering.
 
 The benchmarks are written against a fictional C API (`ficapi`), and use a non-allocating version of the fictional C API to do the benchmarks. Benchmarks are done using [Google Benchmark](https://github.com/google/benchmark). Graphs will come soon once I go to the python meetup and waste an inordinate amount of time making pretty, pretty graphs.
 
 You can run the benchmarks by building with `cmake  -DOUT_PTR_BENCHMARKS=ON path/to/out_ptr/directory`, executing `cmake --build .`, then using `<chosen-build-system-name> run_benchmarks` (where the chosen build system can be `make`  or `ninja`  or similar). You can also run the resulting `out_ptr_benchmarks` executable with your own settings if you like! The canonical runs and benchmark numbers and pretty graphs are kept [here](../../benchmark_results).
 
-![Locally-defined out_ptr](../../benchmark_results/local%20out%20ptr.png)
+![Locally-defined out_ptr](../../benchmark_results/out_ptr/local%20out%20ptr.png)
 
-![Pointer defined outside scope and constantly reset with out_ptr](benchmark_results/reset%20out%20ptr.png)
+![Pointer defined outside scope and constantly reset with out_ptr](../../benchmark_results/out_ptr/reset%20out%20ptr.png)
 
-![Locally-defined with inout_ptr](../../benchmark_results/local%20inout%20ptr.png)
+![Locally-defined with inout_ptr](../../benchmark_results/out_ptr/local%20inout%20ptr.png)
 
-![Pointer defined outside scope and constantly reset with inout_ptr](../../benchmark_results/reset%20inout%20ptr.png)
+![Pointer defined outside scope and constantly reset with inout_ptr](../../benchmark_results/out_ptr/reset%20inout%20ptr.png)
 
 The results of the benchmarks seem to suggest that the clever version of the `out_ptr` abstraction is actually faster than the simple implementation, and competitive with the `c_code` implementation. The `ficapi` code is compiled as a DLL so that the compiler cannot see past it or perform Link-Time Optimization/Code Generation, leaving all benchmarks to incur the same consistent cost for calling the creation and deletion code.
 
