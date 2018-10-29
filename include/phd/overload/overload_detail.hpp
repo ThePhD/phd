@@ -124,6 +124,146 @@ namespace phd::overload_detail {
 		}
 	};
 
+	template <typename F, typename R, typename T, typename... Args>
+	struct b_f__<F, R (T::*)(Args...)&> {
+		F f;
+
+		template <typename Fa>
+		b_f__(Fa&& fa)
+		: f(std::forward<Fa>(fa)) {
+		}
+
+		R operator()(Args... args) {
+			return f(std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename F, typename R, typename T, typename... Args>
+	struct b_f__<F, R (T::*)(Args...) const&> {
+		F f;
+
+		template <typename Fa>
+		b_f__(Fa&& fa)
+		: f(std::forward<Fa>(fa)) {
+		}
+
+		R operator()(Args... args) const {
+			return f(std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename F, typename R, typename T, typename... Args>
+	struct b_f__<F, R (T::*)(Args...) &&> {
+		F f;
+
+		template <typename Fa>
+		b_f__(Fa&& fa)
+		: f(std::forward<Fa>(fa)) {
+		}
+
+		R operator()(Args... args) {
+			return f(std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename F, typename R, typename T, typename... Args>
+	struct b_f__<F, R (T::*)(Args...) const&&> {
+		F f;
+
+		template <typename Fa>
+		b_f__(Fa&& fa)
+		: f(std::forward<Fa>(fa)) {
+		}
+
+		R operator()(Args... args) const {
+			return f(std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename F, typename R, typename T, typename... Args>
+	struct b_f__<F, R (T::*)(Args...) volatile> {
+		F f;
+
+		template <typename Fa>
+		b_f__(Fa&& fa)
+		: f(std::forward<Fa>(fa)) {
+		}
+
+		R operator()(Args... args) {
+			return f(std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename F, typename R, typename T, typename... Args>
+	struct b_f__<F, R (T::*)(Args...) const volatile> {
+		F f;
+
+		template <typename Fa>
+		b_f__(Fa&& fa)
+		: f(std::forward<Fa>(fa)) {
+		}
+
+		R operator()(Args... args) const {
+			return f(std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename F, typename R, typename T, typename... Args>
+	struct b_f__<F, R (T::*)(Args...) volatile&> {
+		F f;
+
+		template <typename Fa>
+		b_f__(Fa&& fa)
+		: f(std::forward<Fa>(fa)) {
+		}
+
+		R operator()(Args... args) {
+			return f(std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename F, typename R, typename T, typename... Args>
+	struct b_f__<F, R (T::*)(Args...) const volatile&> {
+		F f;
+
+		template <typename Fa>
+		b_f__(Fa&& fa)
+		: f(std::forward<Fa>(fa)) {
+		}
+
+		R operator()(Args... args) const {
+			return f(std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename F, typename R, typename T, typename... Args>
+	struct b_f__<F, R (T::*)(Args...) volatile&&> {
+		F f;
+
+		template <typename Fa>
+		b_f__(Fa&& fa)
+		: f(std::forward<Fa>(fa)) {
+		}
+
+		R operator()(Args... args) {
+			return f(std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename F, typename R, typename T, typename... Args>
+	struct b_f__<F, R (T::*)(Args...) const volatile&&> {
+		F f;
+
+		template <typename Fa>
+		b_f__(Fa&& fa)
+		: f(std::forward<Fa>(fa)) {
+		}
+
+		R operator()(Args... args) const {
+			return f(std::forward<Args>(args)...);
+		}
+	};
+
 	template <typename F, typename = void>
 	struct b__ : F {
 		using F::operator();
@@ -134,7 +274,6 @@ namespace phd::overload_detail {
 		}
 	};
 
-	// TODO: final into other optimizations
 	template <typename F>
 	struct b__<F, std::enable_if_t<std::is_final_v<meta::remove_cv_ref_t<F>>>> : b_f__<F, decltype(&F::operator())> {
 		using base_t = b_f__<F, decltype(&F::operator())>;
@@ -210,6 +349,7 @@ namespace phd::overload_detail {
 			return f(std::forward<Args>(args)...);
 		}
 	};
+
 #endif // VC++ 32-bit
 
 	template <typename F>
