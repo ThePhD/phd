@@ -1,0 +1,9 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/phd/phd-targets.cmake")
+
+get_target_property(PHD_INCLUDE_DIRS
+	phd::phd INTERFACE_INCLUDE_DIRECTORIES)
+
+set_and_check(PHD_INCLUDE_DIRS "${PHD_INCLUDE_DIRS}")
+set(PHD_LIBRARIES phd::phd)
