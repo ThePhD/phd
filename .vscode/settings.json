@@ -64,7 +64,16 @@
 		"xstddef": "cpp",
 		"xstring": "cpp",
 		"xtree": "cpp",
-		"xutility": "cpp"
+		"xutility": "cpp",
+		"array": "cpp",
+		"atomic": "cpp",
+		"bitset": "cpp",
+		"condition_variable": "cpp",
+		"cstdarg": "cpp",
+		"mutex": "cpp",
+		"numeric": "cpp",
+		"xthread": "cpp",
+		"thread": "cpp"
 	},
 	"cmake.autoRestartBuild": true,
 	"cmake.saveBeforeBuild": true,

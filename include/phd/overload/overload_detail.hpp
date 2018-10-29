@@ -15,17 +15,17 @@ namespace phd::overload_detail {
 		F f;
 
 		template <typename Fa>
-		b_m__(Fa&& fa)
+		constexpr b_m__(Fa&& fa)
 		: f(std::forward<Fa>(fa)) {
 		}
 
 		template <typename... Args, typename = std::enable_if_t<std::is_invocable_v<F, T, Args...>>>
-		decltype(auto) operator()(T self, Args&&... args) const {
+		constexpr decltype(auto) operator()(T self, Args&&... args) const noexcept(std::is_nothrow_invocable_v<F, T, Args...>) {
 			return (self.*f)(std::forward<Args>(args)...);
 		}
 
 		template <typename... Args, typename = std::enable_if_t<std::is_invocable_v<F, T, Args...>>>
-		decltype(auto) operator()(P self, Args... args) const {
+		constexpr decltype(auto) operator()(P self, Args... args) const noexcept(std::is_nothrow_invocable_v<F, T, Args...>) {
 			return this->operator()(*self, std::forward<Args>(args)...);
 		}
 	};
@@ -38,25 +38,25 @@ namespace phd::overload_detail {
 		F f;
 
 		template <typename Fa>
-		b_m__(Fa&& fa)
+		constexpr b_m__(Fa&& fa)
 		: f(std::forward<Fa>(fa)) {
 		}
 
-		decltype(auto) operator()(const T& self) const {
+		constexpr decltype(auto) operator()(const T& self) const noexcept(std::is_nothrow_invocable_v<F, T>) {
 			return (self.*f);
 		}
 
-		decltype(auto) operator()(T const* self) const {
+		constexpr decltype(auto) operator()(T const* self) const noexcept(std::is_nothrow_invocable_v<F, T>) {
 			return this->operator()(*self);
 		}
 
 		template <typename FArg, typename = std::enable_if_t<!std::is_const_v<R> && std::is_assignable_v<R, FArg>>>
-		decltype(auto) operator()(T& self, FArg&& arg) const {
+		constexpr decltype(auto) operator()(T& self, FArg&& arg) const noexcept(std::is_nothrow_invocable_v<F, T>&& std::is_nothrow_assignable_v<R, FArg>) {
 			return (self.*f) = std::forward<FArg>(arg);
 		}
 
 		template <typename FArg, typename = std::enable_if_t<!std::is_const_v<R> && std::is_assignable_v<R, FArg>>>
-		decltype(auto) operator()(T* self, FArg&& arg) const {
+		constexpr decltype(auto) operator()(T* self, FArg&& arg) const noexcept(std::is_nothrow_invocable_v<F, T>&& std::is_nothrow_assignable_v<R, FArg>) {
 			return this->operator()(*self, std::forward<FArg>(arg));
 		}
 	};
@@ -66,28 +66,28 @@ namespace phd::overload_detail {
 		using F::operator();
 
 		template <typename Fa>
-		b__(Fa&& fa)
+		constexpr b__(Fa&& fa) noexcept(std::is_nothrow_constructible_v<F, Fa>)
 		: F(std::forward<Fa>(fa)) {
 		}
 	};
 
 	template <typename F>
-	struct b__<F, std::enable_if_t<std::is_function_v<F> || std::is_final_v<F>>> {
+	struct b__<F, std::enable_if_t<std::is_function_v<meta::remove_cv_ref_t<F>> || std::is_final_v<meta::remove_cv_ref_t<F>>>> {
 		using stored_f = std::conditional_t<std::is_function_v<F>, std::decay_t<F>, F>;
 		stored_f f;
 
 		template <typename Fa>
-		b__(Fa&& fa)
+		constexpr b__(Fa&& fa) noexcept(std::is_nothrow_constructible_v<stored_f, Fa>)
 		: f(std::forward<Fa>(fa)) {
 		}
 
 		template <typename... Args, typename = std::enable_if_t<std::is_invocable_v<const F, Args...>>>
-		decltype(auto) operator()(Args&&... args) const {
+		constexpr decltype(auto) operator()(Args&&... args) const {
 			return f(std::forward<Args>(args)...);
 		}
 
 		template <typename... Args, typename = std::enable_if_t<std::is_invocable_v<F, Args...>>>
-		decltype(auto) operator()(Args&&... args) {
+		constexpr decltype(auto) operator()(Args&&... args) {
 			return f(std::forward<Args>(args)...);
 		}
 	};
@@ -98,7 +98,7 @@ namespace phd::overload_detail {
 		using b_m__<F>::operator();
 
 		template <typename Fa>
-		b__(Fa&& fa)
+		constexpr b__(Fa&& fa) noexcept(std::is_nothrow_constructible_v<b_m__<F>, Fa>)
 		: b_m__<F>(std::forward<Fa>(fa)) {
 		}
 	};
@@ -113,7 +113,7 @@ namespace phd::overload_detail {
 		using t_<Fs...>::operator();
 
 		template <typename Fa1, typename... Fas>
-		t_(Fa1&& fa1, Fas&&... fas)
+		constexpr t_(Fa1&& fa1, Fas&&... fas) noexcept(std::is_nothrow_constructible_v<b_<F1>, Fa1>&& std::is_nothrow_constructible_v<t_<Fas...>, Fas...>)
 		: b_<F1>(std::forward<Fa1>(fa1)), t_<Fs...>(std::forward<Fas>(fas)...) {
 		}
 	};
@@ -124,7 +124,7 @@ namespace phd::overload_detail {
 		using b_<F>::operator();
 
 		template <typename Fa>
-		t_(Fa&& fa)
+		constexpr t_(Fa&& fa) noexcept(std::is_nothrow_constructible_v<b_<F>, Fa>)
 		: b_<F>(std::forward<Fa>(fa)) {
 		}
 	};

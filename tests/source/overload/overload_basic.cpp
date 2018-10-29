@@ -148,6 +148,21 @@ TEST_CASE("phd/overload/virtual member functions", "overload can handle virtual 
 }
 
 TEST_CASE("phd/overload/reference_wrapped callables", "overload can handle reference wrappers") {
+	SECTION("reference_wrapper") {
+		my_final_callable_i i;
+		my_final_callable_s s;
+		auto ovr = phd::overload(
+			std::ref(i),
+			//std::ref(d),
+			std::ref(s));
+
+		REQUIRE(ovr(2) == 0);
+		//REQUIRE(ovr(3.5) == 1);
+		REQUIRE(ovr("bark") == 2);
+	}
+}
+
+TEST_CASE("phd/overload/reference_wrapped objects", "overload can handle reference wrappers as the objects, including non-std::reference_wrapper") {
 	SECTION("member_functions") {
 		auto ovr = phd::overload(
 			&my_class::i_to_i,
@@ -165,7 +180,7 @@ TEST_CASE("phd/overload/reference_wrapped callables", "overload can handle refer
 		my_class v_obj0_value{};
 		my_class_mixed v_obj1_value{};
 		std::reference_wrapper<my_class> v_obj0(v_obj0_value);
-		std::reference_wrapper<my_class_mixed> v_obj1(v_obj1_value);
+		my_reference_wrapper<my_class_mixed> v_obj1(v_obj1_value);
 		REQUIRE(ovr(v_obj0) == 0);
 		REQUIRE(ovr(v_obj0, 3.5) == 1.0);
 		REQUIRE(ovr(v_obj1) == "2");
@@ -178,19 +193,6 @@ TEST_CASE("phd/overload/final callables", "overload can handle final objects") {
 			my_final_callable_i(),
 			//my_final_callable_d(),
 			my_final_callable_s());
-
-		REQUIRE(ovr(2) == 0);
-		//REQUIRE(ovr(3.5) == 1);
-		REQUIRE(ovr("bark") == 2);
-	}
-	SECTION("reference_wrapper") {
-		my_final_callable_i i;
-		//my_final_callable_d d;
-		my_final_callable_s s;
-		auto ovr = phd::overload(
-			std::ref(i),
-			//std::ref(d),
-			std::ref(s));
 
 		REQUIRE(ovr(2) == 0);
 		//REQUIRE(ovr(3.5) == 1);
