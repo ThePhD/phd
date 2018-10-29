@@ -1,6 +1,6 @@
 set(phd_test_sources
 	"source/overload_basic.cpp"
-	"source/overload_variant.cpp"
+	"source/overload_basic_variant.cpp"
 
 	"source/classes.cpp"
 	"source/functions.cpp"

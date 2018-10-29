@@ -10,10 +10,9 @@
 #include <functional>
 
 TEST_CASE("phd/overload/free functions", "overload can handle non-template free functions") {
-	auto ovr = phd::overload(i_to_i, d_to_i, s_to_i);
+	auto ovr = phd::overload(i_to_i, s_to_i);
 
 	REQUIRE(ovr(2) == 0);
-	REQUIRE(ovr(3.5) == 1);
 	REQUIRE(ovr("bark") == 2);
 }
 
@@ -54,24 +53,20 @@ TEST_CASE("phd/overload/member functions", "overload can handle member functions
 	SECTION("value self") {
 		auto ovr = phd::overload(
 			&my_class::i_to_i,
-			&my_class::d_to_i,
 			&my_class::s_to_i);
 		my_class v_obj{};
 
 		REQUIRE(ovr(v_obj, 2) == 0);
-		REQUIRE(ovr(v_obj, 3.5) == 1);
 		REQUIRE(ovr(v_obj, "bark") == 2);
 	}
 	SECTION("pointer self") {
 		auto ovr = phd::overload(
 			&my_class::i_to_i,
-			&my_class::d_to_i,
 			&my_class::s_to_i);
 		std::unique_ptr<my_class> ptr_obj = std::make_unique<my_class>();
 		my_class* v_obj = ptr_obj.get();
 
 		REQUIRE(ovr(v_obj, 2) == 0);
-		REQUIRE(ovr(v_obj, 3.5) == 1);
 		REQUIRE(ovr(v_obj, "bark") == 2);
 	}
 	SECTION("value self/mixed") {
@@ -96,7 +91,7 @@ TEST_CASE("phd/overload/member variables", "overload can handle member object po
 		my_class v_obj{};
 
 		REQUIRE(ovr(v_obj) == 0);
-		REQUIRE(ovr(v_obj, 3.5) == 1);
+		REQUIRE(ovr(v_obj, 3.5) == 1.0);
 		REQUIRE(ovr(v_obj, "bark") == 2);
 	}
 	SECTION("pointer self") {
@@ -129,18 +124,13 @@ TEST_CASE("phd/overload/virtual member functions", "overload can handle virtual 
 	SECTION("value self") {
 		auto ovr = phd::overload(
 			&my_derived_class::i_to_i,
-			&my_derived_class::d_to_i,
 			&my_derived_class::s_to_i);
 		std::variant<my_derived_class> v_obj(my_derived_class{});
 		std::variant<int, double, std::string> v0(2);
-		std::variant<int, double, std::string> v1(3.5);
 		std::variant<int, double, std::string> v2("bark");
 
 		int v0_select = std::visit(ovr, v_obj, v0);
 		REQUIRE(v0_select == 0);
-
-		int v1_select = std::visit(ovr, v_obj, v1);
-		REQUIRE(v1_select == 1);
 
 		int v2_select = std::visit(ovr, v_obj, v2);
 		REQUIRE(v2_select == 2);
@@ -148,13 +138,11 @@ TEST_CASE("phd/overload/virtual member functions", "overload can handle virtual 
 	SECTION("pointer self") {
 		auto ovr = phd::overload(
 			&my_derived_class::i_to_i,
-			&my_derived_class::d_to_i,
 			&my_derived_class::s_to_i);
 		std::unique_ptr<my_derived_class> ptr_obj = std::make_unique<my_derived_class>();
 		my_derived_class* v_obj = ptr_obj.get();
 
 		REQUIRE(ovr(v_obj, 2) == 0);
-		REQUIRE(ovr(v_obj, 3.5) == 1);
 		REQUIRE(ovr(v_obj, "bark") == 2);
 	}
 }
@@ -163,12 +151,10 @@ TEST_CASE("phd/overload/reference_wrapped callables", "overload can handle refer
 	SECTION("member_functions") {
 		auto ovr = phd::overload(
 			&my_class::i_to_i,
-			&my_class::d_to_i,
 			&my_class::s_to_i);
 		my_class v_obj_value{};
 		std::reference_wrapper<my_class> v_obj(v_obj_value);
 		REQUIRE(ovr(v_obj, 2) == 0);
-		REQUIRE(ovr(v_obj, 3.5) == 1);
 		REQUIRE(ovr(v_obj, "bark") == 2);
 	}
 	SECTION("member_variables") {
@@ -190,11 +176,11 @@ TEST_CASE("phd/overload/final callables", "overload can handle final objects") {
 	SECTION("plain") {
 		auto ovr = phd::overload(
 			my_final_callable_i(),
-			my_final_callable_d(),
+			//my_final_callable_d(),
 			my_final_callable_s());
 
 		REQUIRE(ovr(2) == 0);
-		REQUIRE(ovr(3.5) == 1);
+		//REQUIRE(ovr(3.5) == 1);
 		REQUIRE(ovr("bark") == 2);
 	}
 	SECTION("reference_wrapper") {

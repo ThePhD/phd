@@ -70,5 +70,6 @@
 	"cmake.saveBeforeBuild": true,
 	"cmake.configureSettings": {
 		"PHD_TESTS": "true"
-	}
+	},
+	"C_Cpp.configurationWarnings": "Disabled"
 }
