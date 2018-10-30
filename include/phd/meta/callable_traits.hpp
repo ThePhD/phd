@@ -8,7 +8,7 @@ namespace phd::meta {
 
 	namespace meta_detail {
 
-		template <class F>
+		template <typename F>
 		struct check_deducible_signature {
 			struct nat {};
 			template <class G>
@@ -20,8 +20,11 @@ namespace phd::meta {
 		};
 	} // namespace meta_detail
 
-	template <class F>
+	template <typename F>
 	struct has_deducible_signature : meta_detail::check_deducible_signature<F>::type {};
+
+	template <typename F>
+	inline constexpr bool has_deducible_signature_v = has_deducible_signature<F>::value;
 
 	namespace meta_detail {
 

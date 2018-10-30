@@ -9,7 +9,8 @@ namespace phd::overload_detail {
 
 	template <typename F, typename = void>
 	struct b_m__ {
-		using T = std::add_lvalue_reference_t<typename meta::callable_traits<F>::qualified_object_type>;
+		using T = typename meta::callable_traits<F>::object_type;
+		using TRef = std::add_lvalue_reference_t<typename meta::callable_traits<F>::qualified_object_type>;
 		using P = std::add_pointer_t<std::remove_reference_t<T>>;
 
 		F f;
@@ -20,13 +21,18 @@ namespace phd::overload_detail {
 		}
 
 		template <typename... Args, typename = std::enable_if_t<std::is_invocable_v<F, T, Args...>>>
-		constexpr decltype(auto) operator()(T self, Args&&... args) const noexcept(std::is_nothrow_invocable_v<F, T, Args...>) {
+		constexpr decltype(auto) operator()(TRef self, Args&&... args) const noexcept(std::is_nothrow_invocable_v<F, T, Args...>) {
 			return (self.*f)(std::forward<Args>(args)...);
 		}
 
 		template <typename... Args, typename = std::enable_if_t<std::is_invocable_v<F, T, Args...>>>
 		constexpr decltype(auto) operator()(P self, Args... args) const noexcept(std::is_nothrow_invocable_v<F, T, Args...>) {
 			return this->operator()(*self, std::forward<Args>(args)...);
+		}
+
+		template <typename Self, typename... Args, typename = std::enable_if_t<!(std::is_convertible_v<Self, TRef> || std::is_convertible_v<Self, P>)&&std::is_invocable_v<F, T, Args...>>>
+		constexpr decltype(auto) operator()(Self&& self, Args... args) const noexcept(std::is_nothrow_invocable_v<F, T, Args...>) {
+			return this->operator()(std::forward<Self>(self).operator->(), std::forward<Args>(args)...);
 		}
 	};
 
@@ -50,6 +56,11 @@ namespace phd::overload_detail {
 			return this->operator()(*self);
 		}
 
+		template <typename Self, typename = std::enable_if_t<!(std::is_convertible_v<Self, const T&> || std::is_convertible_v<Self, T const*>)&&std::is_invocable_v<F, Self>>>
+		constexpr decltype(auto) operator()(Self&& self) const noexcept(std::is_nothrow_invocable_v<F, Self>) {
+			return this->operator()(self.operator->());
+		}
+
 		template <typename FArg, typename = std::enable_if_t<!std::is_const_v<R> && std::is_assignable_v<R, FArg>>>
 		constexpr decltype(auto) operator()(T& self, FArg&& arg) const noexcept(std::is_nothrow_invocable_v<F, T>&& std::is_nothrow_assignable_v<R, FArg>) {
 			return (self.*f) = std::forward<FArg>(arg);
@@ -59,20 +70,15 @@ namespace phd::overload_detail {
 		constexpr decltype(auto) operator()(T* self, FArg&& arg) const noexcept(std::is_nothrow_invocable_v<F, T>&& std::is_nothrow_assignable_v<R, FArg>) {
 			return this->operator()(*self, std::forward<FArg>(arg));
 		}
-	};
 
-	template <typename F, typename = void>
-	struct b__ : F {
-		using F::operator();
-
-		template <typename Fa>
-		constexpr b__(Fa&& fa) noexcept(std::is_nothrow_constructible_v<F, Fa>)
-		: F(std::forward<Fa>(fa)) {
+		template <typename Self, typename FArg, typename = std::enable_if_t<!(std::is_convertible_v<Self, T&> || std::is_convertible_v<Self, T*>)&&!std::is_const_v<R> && std::is_assignable_v<R, FArg> && std::is_invocable_v<F, Self>>>
+		constexpr decltype(auto) operator()(Self&& self, FArg&& arg) const noexcept(std::is_nothrow_invocable_v<F, T>&& std::is_nothrow_assignable_v<R, FArg>) {
+			return this->operator()(self.operator->(), std::forward<FArg>(arg));
 		}
 	};
 
-	template <typename F>
-	struct b__<F, std::enable_if_t<std::is_function_v<meta::remove_cv_ref_t<F>> || std::is_final_v<meta::remove_cv_ref_t<F>>>> {
+	template <typename F, typename = void>
+	struct b__ {
 		using stored_f = std::conditional_t<std::is_function_v<F>, std::decay_t<F>, F>;
 		stored_f f;
 
@@ -93,6 +99,16 @@ namespace phd::overload_detail {
 	};
 
 	template <typename F>
+	struct b__<F, std::enable_if_t<meta::has_deducible_signature_v<F> && !(std::is_function_v<meta::remove_cv_ref_t<F>> || std::is_final_v<meta::remove_cv_ref_t<F>>)>> : F {
+		using F::operator();
+
+		template <typename Fa>
+		constexpr b__(Fa&& fa) noexcept(std::is_nothrow_constructible_v<F, Fa>)
+		: F(std::forward<Fa>(fa)) {
+		}
+	};
+
+	template <typename F>
 	struct b__<F, std::enable_if_t<std::is_member_pointer_v<meta::remove_cv_ref_t<F>>>> : b_m__<F> {
 
 		using b_m__<F>::operator();
@@ -106,8 +122,14 @@ namespace phd::overload_detail {
 	template <typename F>
 	using b_ = b__<std::remove_pointer_t<F>>;
 
+	template <typename... Fs>
+	struct t_;
+
+	template <>
+	struct t_<> {};
+
 	template <typename F1, typename... Fs>
-	struct t_ : public b_<F1>, public t_<Fs...> {
+	struct t_<F1, Fs...> : public b_<F1>, public t_<Fs...> {
 
 		using b_<F1>::operator();
 		using t_<Fs...>::operator();

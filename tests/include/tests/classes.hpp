@@ -16,9 +16,19 @@ public:
 	: p(std::addressof(r)) {
 	}
 
-	operator T&() const {
+	T& get_ref() const {
 		return *p;
 	}
+
+	operator T&() const {
+		return get_ref();
+	}
+};
+
+using i_to_i_f_ptr = int (*)(int);
+
+struct my_convertible_class {
+	operator i_to_i_f_ptr() const;
 };
 
 struct my_class {
@@ -76,21 +86,15 @@ struct my_derived_class : my_base_class_i, my_base_class_d, my_base_class_s {
 };
 
 struct my_final_callable_i final {
-	int operator()(int) {
-		return 0;
-	}
+	int operator()(int);
 };
 
 struct my_final_callable_d final {
-	int operator()(double) {
-		return 1;
-	}
+	int operator()(double);
 };
 
 struct my_final_callable_s final {
-	int operator()(std::string) const {
-		return 2;
-	}
+	int operator()(std::string) const;
 };
 
 #endif // PHD_TESTS_CLASSES_HPP
