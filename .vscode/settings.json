@@ -82,5 +82,6 @@
 		"PHD_BENCHMARKS": "true",
 		"PHD_EXAMPLES": "true"
 	},
-	"C_Cpp.configurationWarnings": "Disabled"
+	"C_Cpp.configurationWarnings": "Disabled",
+	"C_Cpp.intelliSenseEngineFallback": "Disabled"
 }

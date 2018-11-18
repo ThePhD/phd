@@ -6,6 +6,9 @@
 #include <phd/text/basic_text.hpp>
 #include <phd/text/encoding.hpp>
 #include <phd/text/basic_c_string_view.hpp>
+#include <phd/text/c_string_view.hpp>
+#include <phd/text/basic_string_literal.hpp>
+#include <phd/text/string_literal.hpp>
 #include <phd/text/char8_t.hpp>
 
 #include <phd/text/text_view.hpp>
