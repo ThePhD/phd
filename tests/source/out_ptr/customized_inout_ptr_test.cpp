@@ -14,8 +14,8 @@ namespace phd {
 		: voidpp_op<handle_inout_ptr<Handle, Pointer, Args>, Pointer>,
 		  Args {
 		public:
-			typedef Handle Smart;
-			typedef typename meta::fancy_pointer_traits<Smart>::pointer source_pointer;
+			using Smart = Handle;
+			using source_pointer = meta::pointer_of_or_t<Smart, Pointer>;
 
 		private:
 			Smart* m_smart_ptr;
@@ -62,13 +62,16 @@ namespace phd {
 		};
 	} // namespace out_ptr_detail
 
-	template <typename T, typename D, typename Pointer, typename Args>
-	struct inout_ptr_t<handle<T, D>, Pointer, Args> : out_ptr_detail::handle_inout_ptr<handle<T, D>, Pointer, Args> {
+	template <typename T, typename D, typename Pointer, typename... Args>
+	struct inout_ptr_t<handle<T, D>, Pointer, Args...> : out_ptr_detail::handle_inout_ptr<handle<T, D>, Pointer, std::tuple<Args...>> {
 	private:
-		using core_t = out_ptr_detail::handle_inout_ptr<handle<T, D>, Pointer, Args>;
+		using Smart = handle<T, D>;
+		using core_t = out_ptr_detail::handle_inout_ptr<Smart, Pointer, std::tuple<Args...>>;
 
 	public:
-		using core_t::core_t;
+		inout_ptr_t(Smart& s, Args... args)
+		: core_t(s, std::forward_as_tuple(std::forward<Args>(args)...)) {
+		}
 	};
 
 } // namespace phd

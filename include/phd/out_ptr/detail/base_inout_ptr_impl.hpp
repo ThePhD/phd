@@ -15,7 +15,7 @@ namespace phd::out_ptr_detail {
 	template <typename Smart, typename Pointer, typename Args, typename List>
 	struct base_inout_ptr_impl : base_out_ptr_impl<Smart, Pointer, Args, List> {
 	private:
-		typedef base_out_ptr_impl<Smart, Pointer, Args, List> base_t;
+		using base_t = base_out_ptr_impl<Smart, Pointer, Args, List>;
 
 	public:
 		base_inout_ptr_impl(Smart& ptr, Args&& args)

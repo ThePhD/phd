@@ -31,8 +31,8 @@ namespace phd {
 		struct friendly_inout_ptr_impl<std::friendly_unique_ptr<T, D>, Pointer, std::tuple<>, std::index_sequence<>>
 		: voidpp_op<friendly_inout_ptr_impl<std::friendly_unique_ptr<T, D>, Pointer, std::tuple<>, std::index_sequence<>>, Pointer> {
 		public:
-			typedef std::friendly_unique_ptr<T, D> Smart;
-			typedef typename meta::fancy_pointer_traits<Smart>::pointer source_pointer;
+			using Smart = std::friendly_unique_ptr<T, D>;
+			using source_pointer = meta::pointer_of_or_t<Smart, Pointer>;
 
 		private:
 			Pointer* m_target_ptr;
@@ -56,28 +56,29 @@ namespace phd {
 		};
 	} // namespace out_ptr_detail
 
-	template <typename Smart, typename Pointer, typename Args, typename List>
-	struct friendly_inout_ptr_t : public out_ptr_detail::friendly_inout_ptr_impl<Smart, Pointer, Args, List> {
+	template <typename Smart, typename Pointer, typename... Args>
+	class friendly_inout_ptr_t : public out_ptr_detail::friendly_inout_ptr_impl<Smart, Pointer, std::tuple<Args...>, std::make_index_sequence<std::tuple_size_v<std::tuple<Args...>>>> {
 	private:
-		using base_t = out_ptr_detail::friendly_inout_ptr_impl<Smart, Pointer, Args, List>;
+		using list_t = std::make_index_sequence<std::tuple_size_v<std::tuple<Args...>>>;
+		using core_t = out_ptr_detail::friendly_inout_ptr_impl<Smart, Pointer, std::tuple<Args...>, list_t>;
 
 	public:
-		using base_t::base_t;
+		friendly_inout_ptr_t(Smart& s, Args... args)
+		: core_t(s, std::forward_as_tuple(std::forward<Args>(args)...)) {
+		}
 	};
 
 	template <typename Pointer,
 		typename Smart,
 		typename... Args>
 	decltype(auto) friendly_inout_ptr(Smart& p, Args&&... args) {
-		using T = decltype(std::forward_as_tuple(std::forward<Args>(args)...));
-		using List = std::make_index_sequence<sizeof...(Args)>;
-		return friendly_inout_ptr_t<Smart, Pointer, T, List>(p, std::forward_as_tuple(std::forward<Args>(args)...));
+		return friendly_inout_ptr_t<Smart, Pointer, Args...>(p, std::forward<Args>(args)...);
 	}
 
 	template <typename Smart,
 		typename... Args>
 	auto friendly_inout_ptr(Smart& p, Args&&... args) {
-		typedef typename meta::fancy_pointer_traits<Smart>::pointer Pointer;
+		using Pointer = meta::pointer_of_t<Smart>;
 		return friendly_inout_ptr<Pointer>(p, std::forward<Args>(args)...);
 	}
 

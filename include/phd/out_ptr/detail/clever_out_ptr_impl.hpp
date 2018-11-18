@@ -21,11 +21,11 @@ namespace phd::out_ptr_detail {
 	template <typename T, typename D, typename Pointer>
 	struct clever_out_ptr_impl<std::unique_ptr<T, D>, Pointer, std::tuple<>, std::index_sequence<>,
 		std::enable_if_t<
-			std::is_same_v<typename meta::fancy_pointer_traits<std::unique_ptr<T, D>>::pointer, Pointer> || std::is_base_of_v<typename meta::fancy_pointer_traits<std::unique_ptr<T, D>>::pointer, Pointer> || !std::is_convertible_v<typename meta::fancy_pointer_traits<std::unique_ptr<T, D>>::pointer, Pointer>>>
+			std::is_same_v<meta::pointer_of_or_t<std::unique_ptr<T, D>, Pointer>, Pointer> || std::is_base_of_v<meta::pointer_of_or_t<std::unique_ptr<T, D>, Pointer>, Pointer> || !std::is_convertible_v<meta::pointer_of_or_t<std::unique_ptr<T, D>, Pointer>, Pointer>>>
 	: voidpp_op<clever_out_ptr_impl<std::unique_ptr<T, D>, Pointer, std::tuple<>, std::index_sequence<>>, Pointer> {
 	public:
-		typedef std::unique_ptr<T, D> Smart;
-		typedef typename meta::fancy_pointer_traits<Smart>::pointer source_pointer;
+		using Smart = std::unique_ptr<T, D>;
+		using source_pointer = meta::pointer_of_or_t<Smart, Pointer>;
 
 	private:
 		using can_aliasing_optimization = std::integral_constant<bool,

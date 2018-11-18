@@ -13,29 +13,30 @@
 
 namespace phd {
 
-	template <typename Smart, typename Ptr, typename Args, typename List>
-	struct simple_out_ptr_t : public out_ptr_detail::base_out_ptr_impl<Smart, Ptr, Args, List> {
+	template <typename Smart, typename Pointer, typename... Args>
+	class simple_out_ptr_t : public out_ptr_detail::base_out_ptr_impl<Smart, Pointer, std::tuple<Args...>, std::make_index_sequence<std::tuple_size_v<std::tuple<Args...>>>> {
 	private:
-		using base_t = out_ptr_detail::base_out_ptr_impl<Smart, Ptr, Args, List>;
+		using list_t = std::make_index_sequence<std::tuple_size_v<std::tuple<Args...>>>;
+		using core_t = out_ptr_detail::base_out_ptr_impl<Smart, Pointer, std::tuple<Args...>, list_t>;
 
 	public:
-		using base_t::base_t;
+		simple_out_ptr_t(Smart& s, Args... args)
+		: core_t(s, std::forward_as_tuple(std::forward<Args>(args)...)) {
+		}
 	};
 
-	template <typename Ptr,
+	template <typename Pointer,
 		typename Smart,
 		typename... Args>
 	auto simple_out_ptr(Smart& p, Args&&... args) noexcept {
-		using T = decltype(std::forward_as_tuple(std::forward<Args>(args)...));
-		using List = std::make_index_sequence<sizeof...(Args)>;
-		return simple_out_ptr_t<Smart, Ptr, T, List>(p, std::forward_as_tuple(std::forward<Args>(args)...));
+		return simple_out_ptr_t<Smart, Pointer, Args...>(p, std::forward<Args>(args)...);
 	}
 
 	template <typename Smart,
 		typename... Args>
 	auto simple_out_ptr(Smart& p, Args&&... args) noexcept {
-		typedef typename meta::fancy_pointer_traits<Smart>::pointer Ptr;
-		return simple_out_ptr<Ptr>(p, std::forward<Args>(args)...);
+		using Pointer = meta::pointer_of_t<Smart>;
+		return simple_out_ptr<Pointer>(p, std::forward<Args>(args)...);
 	}
 
 } // namespace phd

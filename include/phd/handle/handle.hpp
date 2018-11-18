@@ -3,7 +3,7 @@
 #ifndef PHD_HANDLE_HANDLE_HPP
 #define PHD_HANDLE_HANDLE_HPP
 
-#include <phd/meta/pointer_type.hpp>
+#include <phd/meta/pointer_of.hpp>
 #include <phd/base/ebco.hpp>
 
 #include <type_traits>

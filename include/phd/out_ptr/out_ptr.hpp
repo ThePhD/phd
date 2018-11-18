@@ -14,38 +14,36 @@ namespace phd {
 
 	namespace detail {
 #if defined(PHD_OUT_PTR_NO_CLEVERNESS) && PHD_OUT_PTR_NO_CLEVERNESS != 0
-		template <typename Smart, typename Ptr, typename Args, typename List>
-		using core_out_ptr_t = simple_out_ptr_t<Smart, Ptr, Args, List>;
+		template <typename Smart, typename Pointer, typename... Args>
+		using core_out_ptr_t = simple_out_ptr_t<Smart, Pointer, Args...>;
 #else
-		template <typename Smart, typename Ptr, typename Args, typename List>
-		using core_out_ptr_t = clever_out_ptr_t<Smart, Ptr, Args, List>;
+		template <typename Smart, typename Pointer, typename... Args>
+		using core_out_ptr_t = clever_out_ptr_t<Smart, Pointer, Args...>;
 #endif // PHD_OUT_PTR_NO_CLEVERNESS
 	} // namespace detail
 
-	template <typename Smart, typename Ptr, typename Args>
-	struct out_ptr_t : detail::core_out_ptr_t<Smart, Ptr, Args, std::make_index_sequence<std::tuple_size<std::remove_reference_t<Args>>::value>> {
+	template <typename Smart, typename Pointer, typename... Args>
+	class out_ptr_t : public detail::core_out_ptr_t<Smart, Pointer, Args...> {
 	private:
-		using list_t = std::make_index_sequence<std::tuple_size<std::remove_reference_t<Args>>::value>;
-		using core_t = detail::core_out_ptr_t<Smart, Ptr, Args, list_t>;
+		using base_t = detail::core_out_ptr_t<Smart, Pointer, Args...>;
 
 	public:
-		using core_t::core_t;
+		using base_t::base_t;
 	};
 
-	template <typename Ptr,
+	template <typename Pointer,
 		typename Smart,
 		typename... Args>
 	auto out_ptr(Smart& s, Args&&... args) noexcept {
-		using T = decltype(std::forward_as_tuple(std::forward<Args>(args)...));
-		using P = out_ptr_t<Smart, Ptr, T>;
-		return P(s, std::forward_as_tuple(std::forward<Args>(args)...));
+		using P = out_ptr_t<Smart, Pointer, Args...>;
+		return P(s, std::forward<Args>(args)...);
 	}
 
 	template <typename Smart,
 		typename... Args>
 	auto out_ptr(Smart& s, Args&&... args) noexcept {
-		typedef typename meta::fancy_pointer_traits<Smart>::pointer Ptr;
-		return out_ptr<Ptr>(s, std::forward<Args>(args)...);
+		using Pointer = meta::pointer_of_t<Smart>;
+		return out_ptr<Pointer>(s, std::forward<Args>(args)...);
 	}
 
 } // namespace phd

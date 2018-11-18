@@ -15,6 +15,9 @@ set(phd_test_sources
 	"source/overload/overload_basic.cpp"
 	"source/overload/overload_basic_variant.cpp"
 
+	"source/text/text.cpp"
+	"source/text/text_view.cpp"
+
 	"source/classes.cpp"
 	"source/functions.cpp"
 

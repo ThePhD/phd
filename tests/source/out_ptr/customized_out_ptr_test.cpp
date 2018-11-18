@@ -14,8 +14,8 @@ namespace phd {
 		: voidpp_op<handle_out_ptr<Handle, Pointer, Args>, Pointer>,
 		  Args {
 		public:
-			typedef Handle Smart;
-			typedef typename meta::fancy_pointer_traits<Smart>::pointer source_pointer;
+			using Smart = Handle;
+			using source_pointer = meta::pointer_of_or_t<Smart, Pointer>;
 
 		private:
 			Smart* m_smart_ptr;

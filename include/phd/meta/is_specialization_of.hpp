@@ -17,6 +17,9 @@ namespace phd::meta {
 	template <typename T, template <typename...> class Templ>
 	using is_specialization_of = meta_detail::is_specialization_of<std::remove_cv_t<T>, Templ>;
 
+	template <typename T, template <typename...> class Templ>
+	constexpr inline bool is_specialization_of_v = is_specialization_of<T, Templ>::value;
+
 } // namespace phd::meta
 
 #endif // PHD_META_IS_SPECIALIZATION_OF_HPP

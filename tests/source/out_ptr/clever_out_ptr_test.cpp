@@ -9,7 +9,6 @@
 TEST_CASE("clever_out_ptr/basic", "clever_out_ptr type works with smart pointers and C-style output APIs") {
 	SECTION("unique_ptr<void>") {
 		std::unique_ptr<void, ficapi::deleter<>> p(nullptr);
-		bool b = std::is_base_of_v<typename phd::meta::fancy_pointer_traits<std::unique_ptr<void, ficapi::deleter<>>>::pointer, void>;
 		ficapi_create(phd::clever_out_ptr(p), ficapi_type::ficapi_type_int);
 		int* rawp = static_cast<int*>(p.get());
 		REQUIRE(rawp != nullptr);
