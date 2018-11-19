@@ -54,6 +54,19 @@ namespace phd::meta {
 		struct pointer_typedef_enable_if<true, T, Fallback> {
 			typedef typename T::pointer type;
 		};
+
+		template <typename T, typename... Args>
+		struct is_resetable {
+		private:
+			template <typename S>
+			static std::true_type f(decltype(std::declval<S>().reset(std::declval<Args>()...))*);
+			template <typename S>
+			static std::false_type f(...);
+
+		public:
+			constexpr static bool value = std::is_same_v<decltype(f<T>(0)), std::true_type>;
+		};
+
 	} // namespace meta_detail
 
 	template <typename T, typename U>
@@ -81,6 +94,15 @@ namespace phd::meta {
 
 	template <typename T>
 	struct is_releasable<T, std::void_t<decltype(std::declval<T&>().release())>> : std::true_type {};
+
+	template <typename T>
+	constexpr inline bool is_releasable_v = is_releasable<T>::value;
+
+	template <typename T, typename... Args>
+	struct is_resetable : std::integral_constant<bool, meta_detail::is_resetable<T, Args...>::value> {};
+
+	template <typename T, typename... Args>
+	constexpr inline bool is_resetable_v = is_resetable<T, Args...>::value;
 
 } // namespace phd::meta
 

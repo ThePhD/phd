@@ -14,6 +14,16 @@
 
 namespace phd::out_ptr_detail {
 
+	template <typename Smart, typename... Args>
+	void reset_or_create(std::true_type, Smart& s, Args&&... args) {
+		s.reset(std::forward<Args>(args)...);
+	}
+
+	template <typename Smart, typename... Args>
+	void reset_or_create(std::false_type, Smart& s, Args&&... args) {
+		s = Smart(std::forward<Args>(args)...);
+	}
+
 	template <typename Smart, typename Pointer, typename Args, typename List>
 	struct base_out_ptr_impl;
 
@@ -38,7 +48,7 @@ namespace phd::out_ptr_detail {
 		}
 
 		base_out_ptr_impl(Smart& ptr, Args&& args, meta::meta_detail::disambiguate_)
-		: Args(std::move(args)), m_smart_ptr(std::addressof(ptr)) {
+		: Args(std::move(args)), m_smart_ptr(std::addressof(ptr)), p() {
 		}
 
 	public:
@@ -70,7 +80,10 @@ namespace phd::out_ptr_detail {
 		~base_out_ptr_impl() {
 			if (m_smart_ptr) {
 				Args&& args = std::move(static_cast<Args&>(*this));
-				this->m_smart_ptr->reset(static_cast<source_pointer>(this->m_target_ptr), std::get<Indices>(std::move(args))...);
+				// lmao "if constexpr" xD
+				using can_reset = meta::is_resetable<Smart,
+					decltype(std::get<Indices>(std::move(args)))...>;
+				reset_or_create(can_reset(), *this->m_smart_ptr, static_cast<source_pointer>(this->m_target_ptr), std::get<Indices>(std::move(args))...);
 			}
 		}
 	};
