@@ -9,8 +9,6 @@
 
 namespace phd {
 
-#if !defined(_­_­cpp_­deduction_­guides) || _­_­cpp_­deduction_­guides <= 201810L
-
 	template <size_t N>
 	class string_literal : public basic_string_literal<char, N> {
 	private:
@@ -70,8 +68,6 @@ namespace phd {
 
 	template <size_t N>
 	u32string_literal(const char32_t (&)[N])->u32string_literal<N>;
-
-#endif // whether or not it has been implemented yet
 
 } // namespace phd
 

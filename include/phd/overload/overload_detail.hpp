@@ -5,6 +5,8 @@
 #include <phd/meta/remove_cv_ref.hpp>
 #include <phd/meta/callable_traits.hpp>
 
+#include <utility>
+
 namespace phd::overload_detail {
 
 	template <typename F, typename = void>

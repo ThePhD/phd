@@ -5,6 +5,7 @@
 #include <iostream>
 #include <atomic>
 #include <mutex>
+#include <thread>
 #include <array>
 #include <fstream>
 #include <cstdio>

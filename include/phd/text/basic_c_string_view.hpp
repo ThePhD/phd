@@ -6,6 +6,7 @@
 #include <phd/meta/remove_cv_ref.hpp>
 #include <phd/meta/always.hpp>
 #include <phd/text/text_forward.hpp>
+#include <phd/text/char8_t.hpp>
 
 #include <string_view>
 #include <type_traits>
@@ -14,35 +15,44 @@
 namespace phd {
 
 	namespace string_detail {
+#ifdef __cpp_char8_t
+#else
+		using arr8_t = char8_t[1];
+		constexpr inline const arr8_t u8_shim = {};
+#endif
 
 		template <typename C>
-		constexpr inline decltype(auto) empty_string() {
+		constexpr inline decltype(auto) empty_string() noexcept {
 			static_assert(meta::always_false_v<C>, "unrecognized character type");
 			return "";
 		}
 
 		template <>
-		constexpr inline decltype(auto) empty_string<char>() {
+		constexpr inline decltype(auto) empty_string<char>() noexcept {
 			return "";
 		}
 
 		template <>
-		constexpr inline decltype(auto) empty_string<wchar_t>() {
+		constexpr inline decltype(auto) empty_string<wchar_t>() noexcept {
 			return L"";
 		}
 
 		template <>
-		constexpr inline decltype(auto) empty_string<char8_t>() {
+		constexpr inline decltype(auto) empty_string<char8_t>() noexcept {
+#ifdef __cpp_char8_t
 			return u8"";
+#else
+			return (u8_shim);
+#endif
 		}
 
 		template <>
-		constexpr inline decltype(auto) empty_string<char16_t>() {
+		constexpr inline decltype(auto) empty_string<char16_t>() noexcept {
 			return u"";
 		}
 
 		template <>
-		constexpr inline decltype(auto) empty_string<char32_t>() {
+		constexpr inline decltype(auto) empty_string<char32_t>() noexcept {
 			return U"";
 		}
 	} // namespace string_detail

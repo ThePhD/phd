@@ -70,67 +70,67 @@ inline PHD_OPT_BENCH_INLINE size_t bench_transform_3x(tl::optional<T>& maybe_val
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_pure_int(tl::optional<size_t>& maybe_value) {
-	return bench_transform<size_t, decltype(barrier::pure_transform_int), barrier::pure_transform_int>(maybe_value);
+	return bench_transform<size_t, decltype(&barrier::pure_transform_int), &barrier::pure_transform_int>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_inplace_int(tl::optional<size_t&>& maybe_value) {
-	return bench_transform<size_t&, decltype(barrier::inplace_transform_int), barrier::inplace_transform_int>(maybe_value);
+	return bench_transform<size_t&, decltype(&barrier::inplace_transform_int), &barrier::inplace_transform_int>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_pure_int_3x(tl::optional<size_t>& maybe_value) {
-	return bench_transform_3x<size_t, decltype(barrier::pure_transform_int), barrier::pure_transform_int>(maybe_value);
+	return bench_transform_3x<size_t, decltype(&barrier::pure_transform_int), &barrier::pure_transform_int>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_inplace_int_3x(tl::optional<size_t&>& maybe_value) {
-	return bench_transform_3x<size_t&, decltype(barrier::inplace_transform_int), barrier::inplace_transform_int>(maybe_value);
+	return bench_transform_3x<size_t&, decltype(&barrier::inplace_transform_int), &barrier::inplace_transform_int>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_pure_vector(tl::optional<std::vector<size_t>>& maybe_value) {
-	return bench_transform<std::vector<size_t>, decltype(barrier::pure_transform_vector), barrier::pure_transform_vector>(maybe_value);
+	return bench_transform<std::vector<size_t>, decltype(&barrier::pure_transform_vector), &barrier::pure_transform_vector>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_inplace_vector(tl::optional<std::vector<size_t>&>& maybe_value) {
-	return bench_transform<std::vector<size_t>&, decltype(barrier::inplace_transform_vector), barrier::inplace_transform_vector>(maybe_value);
+	return bench_transform<std::vector<size_t>&, decltype(&barrier::inplace_transform_vector), &barrier::inplace_transform_vector>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_pure_vector_3x(tl::optional<std::vector<size_t>>& maybe_value) {
-	return bench_transform_3x<std::vector<size_t>, decltype(barrier::pure_transform_vector), barrier::pure_transform_vector>(maybe_value);
+	return bench_transform_3x<std::vector<size_t>, decltype(&barrier::pure_transform_vector), &barrier::pure_transform_vector>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_inplace_vector_3x(tl::optional<std::vector<size_t>&>& maybe_value) {
-	return bench_transform_3x<std::vector<size_t>&, decltype(barrier::inplace_transform_vector), barrier::inplace_transform_vector>(maybe_value);
+	return bench_transform_3x<std::vector<size_t>&, decltype(&barrier::inplace_transform_vector), &barrier::inplace_transform_vector>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_transparent_pure_int(tl::optional<size_t>& maybe_value) {
-	return bench_transform<size_t, decltype(transparent::pure_transform_int), transparent::pure_transform_int>(maybe_value);
+	return bench_transform<size_t, decltype(&transparent::pure_transform_int), &transparent::pure_transform_int>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_transparent_inplace_int(tl::optional<size_t&>& maybe_value) {
-	return bench_transform<size_t&, decltype(transparent::inplace_transform_int), transparent::inplace_transform_int>(maybe_value);
+	return bench_transform<size_t&, decltype(&transparent::inplace_transform_int), &transparent::inplace_transform_int>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_transparent_pure_int_3x(tl::optional<size_t>& maybe_value) {
-	return bench_transform_3x<size_t, decltype(transparent::pure_transform_int), transparent::pure_transform_int>(maybe_value);
+	return bench_transform_3x<size_t, decltype(&transparent::pure_transform_int), &transparent::pure_transform_int>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_transparent_inplace_int_3x(tl::optional<size_t&>& maybe_value) {
-	return bench_transform_3x<size_t&, decltype(transparent::inplace_transform_int), transparent::inplace_transform_int>(maybe_value);
+	return bench_transform_3x<size_t&, decltype(&transparent::inplace_transform_int), &transparent::inplace_transform_int>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_transparent_pure_vector(tl::optional<std::vector<size_t>>& maybe_value) {
-	return bench_transform<std::vector<size_t>, decltype(transparent::pure_transform_vector), transparent::pure_transform_vector>(maybe_value);
+	return bench_transform<std::vector<size_t>, decltype(&transparent::pure_transform_vector), &transparent::pure_transform_vector>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_transparent_inplace_vector(tl::optional<std::vector<size_t>&>& maybe_value) {
-	return bench_transform<std::vector<size_t>&, decltype(transparent::inplace_transform_vector), transparent::inplace_transform_vector>(maybe_value);
+	return bench_transform<std::vector<size_t>&, decltype(&transparent::inplace_transform_vector), &transparent::inplace_transform_vector>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_transparent_pure_vector_3x(tl::optional<std::vector<size_t>>& maybe_value) {
-	return bench_transform_3x<std::vector<size_t>, decltype(transparent::pure_transform_vector), transparent::pure_transform_vector>(maybe_value);
+	return bench_transform_3x<std::vector<size_t>, decltype(&transparent::pure_transform_vector), &transparent::pure_transform_vector>(maybe_value);
 }
 
 inline PHD_OPT_BENCH_INLINE size_t bench_transparent_inplace_vector_3x(tl::optional<std::vector<size_t>&>& maybe_value) {
-	return bench_transform_3x<std::vector<size_t>&, decltype(transparent::inplace_transform_vector), transparent::inplace_transform_vector>(maybe_value);
+	return bench_transform_3x<std::vector<size_t>&, decltype(&transparent::inplace_transform_vector), &transparent::inplace_transform_vector>(maybe_value);
 }
 
 #endif // PHD_OPTIONAL_BENCHMARKS_BENCH_HPP

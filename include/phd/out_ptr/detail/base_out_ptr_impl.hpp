@@ -48,7 +48,7 @@ namespace phd::out_ptr_detail {
 		}
 
 		base_out_ptr_impl(Smart& ptr, Args&& args, meta::meta_detail::disambiguate_)
-		: Args(std::move(args)), m_smart_ptr(std::addressof(ptr)), p() {
+		: Args(std::move(args)), m_smart_ptr(std::addressof(ptr)), m_target_ptr() {
 		}
 
 	public:
@@ -82,6 +82,7 @@ namespace phd::out_ptr_detail {
 				Args&& args = std::move(static_cast<Args&>(*this));
 				// lmao "if constexpr" xD
 				using can_reset = meta::is_resetable<Smart,
+					decltype(static_cast<source_pointer>(this->m_target_ptr)),
 					decltype(std::get<Indices>(std::move(args)))...>;
 				reset_or_create(can_reset(), *this->m_smart_ptr, static_cast<source_pointer>(this->m_target_ptr), std::get<Indices>(std::move(args))...);
 			}

@@ -4,11 +4,24 @@
 #define PHD_META_ALWAYS_HPP
 
 #include <type_traits>
+#include <cstddef>
 
 namespace phd::meta {
 
 	template <typename>
 	using always_false = std::integral_constant<bool, false>;
+
+	template <typename T, T>
+	using always_false_constant = always_false<void>;
+
+	template <typename T, T v>
+	constexpr inline bool always_false_constant_v = always_false_constant<T, v>::value;
+
+	template <std::size_t>
+	using always_false_index = always_false<void>;
+
+	template <std::size_t v>
+	constexpr inline bool always_false_index_v = always_false_index<v>::value;
 
 	template <typename T>
 	constexpr inline bool always_false_v = always_false<T>::value;

@@ -140,7 +140,7 @@ namespace phd {
 
 		template <typename... DxArgs>
 		handle(std::nullptr_t, DxArgs&&... dx_args) noexcept
-		: deleter_base(std::forward<Dx>(dx)...) {
+		: deleter_base(std::forward<Dx>(dx_args)...) {
 			deleter_type& deleter = get_deleter();
 			detail::write_null(deleter, res);
 		}
@@ -197,7 +197,7 @@ namespace phd {
 			res = h;
 		}
 
-		void reset(std::nullptr_t) noexcept {
+		void reset(std::nullptr_t = nullptr) noexcept {
 			deleter_type& deleter = this->get_deleter();
 			if (!is_null())
 				deleter(res);

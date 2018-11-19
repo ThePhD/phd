@@ -12,7 +12,7 @@ namespace phd {
 
 	namespace detail {
 		template <class InputIt, class OutputIt>
-		constexpr OutputIt _Constexpr_copy(InputIt first, InputIt last, OutputIt out_first) {
+		constexpr OutputIt constexpr_copy(InputIt first, InputIt last, OutputIt out_first) {
 			while (first != last) {
 				*out_first++ = *first++;
 			}
@@ -36,7 +36,7 @@ namespace phd {
 
 		constexpr basic_string_literal(const storage_type& a)
 		: arr{} {
-			_Std_detail::_Constexpr_copy(a + 0, a + N, arr + 0);
+			detail::constexpr_copy(a + 0, a + N, arr + 0);
 		}
 
 		constexpr basic_string_literal() noexcept {

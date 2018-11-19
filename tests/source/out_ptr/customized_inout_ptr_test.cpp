@@ -1,6 +1,7 @@
 #include <phd/out_ptr/inout_ptr.hpp>
 
 #include <phd/handle/handle.hpp>
+#include <phd/meta/meta.hpp>
 #include <ficapi/ficapi.hpp>
 
 #include <catch2/catch.hpp>
@@ -57,7 +58,7 @@ namespace phd {
 
 			template <std::size_t I0, std::size_t... I>
 			void reset(std::index_sequence<I0, I...>) {
-				static_assert(false, "you cannot reset the deleter for handle<T, Deleter>!: it only takes one argument!");
+				static_assert(meta::always_false_index_v<I0>, "you cannot reset the deleter for handle<T, Deleter>!: it only takes one argument!");
 			}
 		};
 	} // namespace out_ptr_detail

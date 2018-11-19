@@ -2,7 +2,9 @@
 #ifndef PHD_TEXT_BASIC_TEXT_VIEW_HPP
 #define PHD_TEXT_BASIC_TEXT_VIEW_HPP
 
-#include <phd/text/text_forward.hpp>
+#include <phd/text/basic_c_string_view.hpp>
+#include <phd/text/normalization.hpp>
+#include <phd/text/code_unit.hpp>
 
 namespace phd {
 
