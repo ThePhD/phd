@@ -34,13 +34,11 @@ include(Common/core)
 # # Options
 option(PHD_CI "Whether or not we are in continguous integration mode" OFF)
 option(PHD_TESTS "Enable build of tests" OFF)
-option(PHD_TESTS "Enable build of examples" OFF)
+option(PHD_EXAMPLES "Enable build of examples" OFF)
 option(PHD_BENCHMARKS "Enable build of benchmarks" OFF)
 
 # # Targets
 set(phd_sources 
-	"include/phd/overload/overload.hpp"
-	"include/phd/overload/overload_detail.hpp"
 	"include/phd/phd.hpp"
 )
 prepend(prefixed_phd_sources "${CMAKE_CURRENT_SOURCE_DIR}/" ${phd_sources})

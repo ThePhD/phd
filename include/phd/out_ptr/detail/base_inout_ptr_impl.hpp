@@ -19,7 +19,7 @@ namespace phd::out_ptr_detail {
 
 	public:
 		base_inout_ptr_impl(Smart& ptr, Args&& args)
-		: base_t(ptr, std::move(args), ptr.release()) {
+		: base_t(ptr, std::move(args), ptr.get()) {
 			static_assert(meta::is_releasable_v<Smart>, "You cannot use an inout pointer with something that cannot release() its pointer!");
 		}
 
@@ -34,6 +34,7 @@ namespace phd::out_ptr_detail {
 		base_inout_ptr_impl& operator=(const base_inout_ptr_impl&) = delete;
 
 		~base_inout_ptr_impl() {
+			this->m_smart_ptr->release();
 		}
 	};
 } // namespace phd::out_ptr_detail

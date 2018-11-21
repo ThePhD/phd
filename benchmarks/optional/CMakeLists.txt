@@ -1,8 +1,5 @@
 include(Common/core)
 
-# Get Python interpreter for cache stuff
-find_package(PythonInterp 3)
-
 # Subdirectory TL's optional
 set(OPTIONAL_ENABLE_TESTS OFF CACHE INTERNAL "Enable tests." FORCE)
 set(OPTIONAL_ENABLE_DOCS OFF CACHE INTERNAL "Enable documentation." FORCE)

@@ -13,8 +13,18 @@ import fnmatch
 import sys
 
 
-def name_sorter(b):
+def len_sorter(x):
+	return len(x)
+
+
+def entry_name_sorter(b):
 	return b["name"]
+
+
+def is_noop_category(n):
+	noop_names = ["noop", "no-op", "no op"]
+	s = n.casefold()
+	return s in noop_names
 
 
 def aggregate_categories(all_benchmarks, data_point_names):
@@ -31,8 +41,19 @@ def aggregate_categories(all_benchmarks, data_point_names):
 		data_point_name = data_point_names[0][0]
 		return mean_group[data_point_name]
 
+	# find no-op category and use it in all benchmarks
+	noop_benches = None
 	for b in all_benchmarks:
 		category = b["category"]
+		if is_noop_category(category):
+			noop_benches = b
+			break
+
+	for b in all_benchmarks:
+		category = b["category"]
+		if is_noop_category(category):
+			continue
+
 		if category not in benchmarks:
 			benchmarks[category] = {
 			    "benchmarks": [],
@@ -41,6 +62,8 @@ def aggregate_categories(all_benchmarks, data_point_names):
 			        "max": sys.float_info.min
 			    }
 			}
+			if (noop_benches):
+				benchmarks[category]["benchmarks"].append(noop_benches)
 
 		target_category = benchmarks[category]
 		target_entries = target_category["benchmarks"]
@@ -58,7 +81,7 @@ def aggregate_categories(all_benchmarks, data_point_names):
 		# benchmark appropriately (and make those
 		# color assignments stable)
 		entries = category_benchmarks["benchmarks"]
-		entries.sort(key=name_sorter)
+		entries.sort(key=entry_name_sorter)
 		for bi, entry in enumerate(entries):
 			entry["name_index"] = bi
 			ci = entry["color_index"]
@@ -103,7 +126,9 @@ def parse_json(j, data_point_names, name_removals, categories, scale,
 		category = ""
 		benchmark_name = base_name
 		point_scalar = 1
-		if len(potential_categories) == 1:
+		if (len(potential_categories) > 1):
+			potential_categories.sort(key=len_sorter, reverse=True)
+		if len(potential_categories) > 0:
 			category = potential_categories[0]
 			if category in scale_categories:
 				point_scalar = 1 / scale
@@ -177,8 +202,8 @@ def draw_graph(name, category, benchmarks_heuristics, data_point_names,
 	figures, axes = plt.subplots()
 
 	# set name we're going to use
-	figure_name = name if name != None and len(name) > 0 else category.replace(
-	    "_", "")
+	figure_name = name if name != None and len(
+	    name) > 0 else category.replace("_", "")
 
 	# get the values of the time scale to perform bisecting
 	time_scale_values_from_seconds = [x[2] for x in time_scales]
@@ -330,8 +355,8 @@ def draw_graph(name, category, benchmarks_heuristics, data_point_names,
 	if (num_data_points > 1):
 		# a proper legend for each name in data_point_names
 		legend_texts = [
-		    (data_point_name[0] + ('- lower=good'
-		                           if data_point_name[1] else 'higher=good')
+		    (data_point_name[0] +
+		     ('- lower=good' if data_point_name[1] else 'higher=good')
 		     for data_point_name in data_point_names)
 		]
 		# retrieve the color/shape of the bar as a reference so we can construct

@@ -4,11 +4,14 @@ set(phd_out_ptr_benchmarks_sources
 	"include/benchmarks/benchmark_compute.hpp"
 	"source/benchmark_compute.cpp"
 
-	"source/out_ptr_benchmarks_local.cpp"
-	"source/out_ptr_benchmarks_reset.cpp"
+	"source/shared_local_out_ptr_benchmarks.cpp"
+	"source/shared_reset_out_ptr_benchmarks.cpp"
 
-	"source/inout_ptr_benchmarks_local.cpp"
-	"source/inout_ptr_benchmarks_reset.cpp"
+	"source/local_out_ptr_benchmarks.cpp"
+	"source/reset_out_ptr_benchmarks.cpp"
+
+	"source/local_inout_ptr_benchmarks.cpp"
+	"source/reset_inout_ptr_benchmarks.cpp"
 
 	"source/out_ptr_benchmarks_main.cpp"
 )
@@ -38,29 +41,30 @@ set(PHD_OUT_PTR_BENCHMARKS_FORMAT ${PHD_OUT_PTR_BENCHMARKS_FORMAT_LOWER}
 	CACHE STRING "The output format of the data. Must be json or csv" FORCE)
 
 set(PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTDIR "${CMAKE_SOURCE_DIR}/benchmark_results/out_ptr")
-set(PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTFILE "${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTDIR}/PHD_OUT_PTR_benchmarks.${PHD_OUT_PTR_BENCHMARKS_FORMAT}")
+set(PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTFILE "${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTDIR}/out_ptr_benchmarks.${PHD_OUT_PTR_BENCHMARKS_FORMAT}")
+set(PHD_OUT_PTR_BENCHMARKS_GRAPH_OUTDIR "${CMAKE_SOURCE_DIR}/benchmark_results/out_ptr")
 file(MAKE_DIRECTORY "${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTDIR}")
 
-set(phd_out_ptr_benchmarks_categories local_out_ptr,reset_out_ptr,local_inout_ptr,reset_inout_ptr)
+set(phd_out_ptr_benchmarks_categories shared_local_out_ptr shared_reset_out_ptr local_out_ptr reset_out_ptr local_inout_ptr reset_inout_ptr)
 
-add_custom_target(phd_out_ptr_benchmarks_runner
+add_custom_command(
+	OUTPUT "${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTFILE}"
 	COMMAND phd_out_ptr_benchmarks 
 		"--benchmark_out=${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTFILE}" 
 		"--benchmark_out_format=${PHD_OUT_PTR_BENCHMARKS_FORMAT}" 
 		"--benchmark_repetitions=${PHD_OUT_PTR_BENCHMARKS_REPETITIONS}"
 	DEPENDS phd_out_ptr_benchmarks
-	BYPRODUCTS ${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTFILE}
 	COMMENT "Executing Benchmarks and outputting to '${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTFILE}'"
 )
 
-if (PYTHONINTERP_FOUND)
+if (Python3_Interpreter_FOUND)
 	add_custom_target(phd_out_ptr_benchmarks_graphs_generator
-		COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/benchmarks/tools/generate_graphs.py" 
-			"--input=${PHD_OUT_PTR_BENCHMARKS_RESET_OUTFILE}"
+		COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/benchmarks/tools/generate_graphs.py" 
+			"--input=${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTFILE}"
 			"--input_format=${PHD_OUT_PTR_BENCHMARKS_FORMAT}"
 			"--output_dir=${PHD_OUT_PTR_BENCHMARKS_GRAPH_OUTDIR}"
-			"--categories=${phd_out_ptr_benchmarks_categories}"
-		DEPENDS phd_out_ptr_benchmarks phd_out_ptr_benchmarks_runner
+			--categories ${phd_out_ptr_benchmarks_categories}
+		DEPENDS phd_out_ptr_benchmarks 
 		COMMENT "Graphing '${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTFILE}' data to '${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTDIR}'"
 	)
 endif()

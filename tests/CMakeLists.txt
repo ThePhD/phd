@@ -32,7 +32,7 @@ if (MSVC)
 		PRIVATE /std:c++latest)
 else()
 	target_compile_options(phd_test
-		PRIVATE -std=c++1z)
+		PRIVATE -std=c++2a)
 endif()
 target_include_directories(phd_test
 	PRIVATE 

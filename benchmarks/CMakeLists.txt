@@ -1,5 +1,5 @@
 # Get Python interpreter for cache stuff
-find_package(PythonInterp 3)
+find_package(Python3)
 
 # Subdirectory Google Benchmark, after setting all cache variables
 set(BENCHMARK_ENABLE_EXCEPTIONS ON CACHE INTERNAL "Enable the use of exceptions in the benchmark library." FORCE)

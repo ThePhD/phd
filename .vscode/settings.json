@@ -80,8 +80,9 @@
 	"cmake.configureSettings": {
 		"PHD_TESTS": "true",
 		"PHD_BENCHMARKS": "true",
-		"PHD_EXAMPLES": "true"
+		"PHD_EXAMPLES": "true",
+		"PHD_OUT_PTR_BENCHMARKS_REPETITIONS": 150
 	},
 	"C_Cpp.configurationWarnings": "Disabled",
-	"C_Cpp.intelliSenseEngineFallback": "Disabled"
+	"C_Cpp.intelliSenseEngineFallback": "Disabled",
 }

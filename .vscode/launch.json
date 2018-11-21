@@ -5,6 +5,25 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "out_ptr graph generation",
+			"type": "python",
+			"request": "launch",
+			"program": "${workspaceFolder}/benchmarks/tools/generate_graphs.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--input=benchmark_results/out_ptr/out_ptr_benchmarks.json",
+				"--input_format=json",
+				"--output_dir=benchmark_results/out_ptr/",
+				"--categories",
+				"shared_local_out_ptr",
+				"shared_reset_out_ptr",
+				"local_out_ptr",
+				"reset_out_ptr",
+				"local_inout_ptr",
+				"reset_inout_ptr",
+			]
+		},
+		{
 			"name": "(Windows) Launch",
 			"type": "cppvsdbg",
 			"request": "launch",

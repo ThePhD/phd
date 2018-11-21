@@ -6,6 +6,28 @@
 
 #include <iostream>
 
+struct base1 {
+	virtual ~base1() {
+	}
+};
+struct base2 {
+	virtual ~base2() {
+	}
+};
+struct derived1 : base1 {};
+struct derived2 : base1, base2 {};
+
+int init_derived2(derived2** pp_derived, bool please_fail = false) {
+	if (please_fail) {
+		// do not set *pp_derived
+		// to test if internal
+		// initialization of the out_ptr affects things
+		return 1;
+	}
+	*pp_derived = new derived2();
+	return 0;
+}
+
 TEST_CASE("out_ptr/basic", "out_ptr type works with smart pointers and C-style output APIs") {
 	SECTION("unique_ptr<void>") {
 		std::unique_ptr<void, ficapi::deleter<>> p(nullptr);
@@ -241,4 +263,13 @@ TEST_CASE("out_ptr/fail", "out_ptr type will static assert various bad usages") 
 		REQUIRE(*rawp == ficapi_get_dynamic_data());
 	}
 	*/
+
+	// EXPECTED: COMPILE FAIL
+
+	SECTION("base to derived cast") {
+		std::unique_ptr<base1> p(nullptr);
+		int err = init_derived2(phd::out_ptr<derived2*>(p), false);
+		REQUIRE(err == 0);
+		REQUIRE(p.get() != nullptr);
+	}
 }
