@@ -1,6 +1,6 @@
 // Copyright � 2018 ThePhD
 
-#include <benchmarks/benchmark_compute.hpp>
+#include <benchmarks/statistics.hpp>
 
 #include <vector>
 #include <algorithm>

@@ -1,4 +1,4 @@
-#include <benchmarks/benchmark_compute.hpp>
+#include <benchmarks/statistics.hpp>
 
 #include <benchmark/benchmark.h>
 

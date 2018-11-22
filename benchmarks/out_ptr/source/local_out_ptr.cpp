@@ -1,4 +1,4 @@
-#include <benchmarks/benchmark_compute.hpp>
+#include <benchmarks/statistics.hpp>
 
 #include <benchmark/benchmark.h>
 
@@ -11,31 +11,31 @@
 #include <memory>
 #include <cstdlib>
 
-static void c_code_reset_out_ptr(benchmark::State& state) {
+static void c_code_local_out_ptr(benchmark::State& state) {
 	int64_t x = 0;
-	ficapi_opaque_handle p = NULL;
 	for (auto _ : state) {
-		if (p != NULL) {
-			ficapi_handle_no_alloc_delete(p);
-		}
+		ficapi_opaque_handle p = NULL;
 		ficapi_handle_no_alloc_create(&p);
 		x += ficapi_handle_get_data(p);
-	}
-	if (p != NULL) {
 		ficapi_handle_no_alloc_delete(p);
 	}
+	int64_t expected = int64_t(state.iterations()) * ficapi_get_data();
+	if (x != expected) {
+		state.SkipWithError("Unexpected result");
+		return;
+	}
 }
-BENCHMARK(c_code_reset_out_ptr)
-
+BENCHMARK(c_code_local_out_ptr)
 	->ComputeStatistics("max", &compute_max)
 	->ComputeStatistics("min", &compute_min)
 	->ComputeStatistics("dispersion", &compute_index_of_dispersion);
 
-static void manual_reset_out_ptr(benchmark::State& state) {
+static void manual_local_out_ptr(benchmark::State& state) {
 	int64_t x = 0;
-	std::unique_ptr<ficapi::opaque, ficapi::handle_no_alloc_deleter> p(nullptr);
 	for (auto _ : state) {
+		std::unique_ptr<ficapi::opaque, ficapi::handle_no_alloc_deleter> p(nullptr);
 		ficapi_opaque_handle temp_p = NULL;
+
 		ficapi_handle_no_alloc_create(&temp_p);
 		p.reset(temp_p);
 		x += ficapi_handle_get_data(p.get());
@@ -46,16 +46,15 @@ static void manual_reset_out_ptr(benchmark::State& state) {
 		return;
 	}
 }
-BENCHMARK(manual_reset_out_ptr)
-
+BENCHMARK(manual_local_out_ptr)
 	->ComputeStatistics("max", &compute_max)
 	->ComputeStatistics("min", &compute_min)
 	->ComputeStatistics("dispersion", &compute_index_of_dispersion);
 
-static void simple_reset_out_ptr(benchmark::State& state) {
+static void simple_local_out_ptr(benchmark::State& state) {
 	int64_t x = 0;
-	std::unique_ptr<ficapi::opaque, ficapi::handle_no_alloc_deleter> p(nullptr);
 	for (auto _ : state) {
+		std::unique_ptr<ficapi::opaque, ficapi::handle_no_alloc_deleter> p(nullptr);
 		ficapi_handle_no_alloc_create(phd::simple_out_ptr(p));
 		x += ficapi_handle_get_data(p.get());
 	}
@@ -65,16 +64,15 @@ static void simple_reset_out_ptr(benchmark::State& state) {
 		return;
 	}
 }
-BENCHMARK(simple_reset_out_ptr)
-
+BENCHMARK(simple_local_out_ptr)
 	->ComputeStatistics("max", &compute_max)
 	->ComputeStatistics("min", &compute_min)
 	->ComputeStatistics("dispersion", &compute_index_of_dispersion);
 
-static void clever_reset_out_ptr(benchmark::State& state) {
+static void clever_local_out_ptr(benchmark::State& state) {
 	int64_t x = 0;
-	std::unique_ptr<ficapi::opaque, ficapi::handle_no_alloc_deleter> p(nullptr);
 	for (auto _ : state) {
+		std::unique_ptr<ficapi::opaque, ficapi::handle_no_alloc_deleter> p(nullptr);
 		ficapi_handle_no_alloc_create(phd::clever_out_ptr(p));
 		x += ficapi_handle_get_data(p.get());
 	}
@@ -84,19 +82,17 @@ static void clever_reset_out_ptr(benchmark::State& state) {
 		return;
 	}
 }
-BENCHMARK(clever_reset_out_ptr)
-
+BENCHMARK(clever_local_out_ptr)
 	->ComputeStatistics("max", &compute_max)
 	->ComputeStatistics("min", &compute_min)
 	->ComputeStatistics("dispersion", &compute_index_of_dispersion);
 
-
 #if defined(PHD_OUT_PTR_HAS_FRIENDLY_UNIQUE_PTR) && PHD_OUT_PTR_HAS_FRIENDLY_UNIQUE_PTR != 0
 
-static void friendly_reset_out_ptr(benchmark::State& state) {
+static void friendly_local_out_ptr(benchmark::State& state) {
 	int64_t x = 0;
-	std::friendly_unique_ptr<ficapi::opaque, ficapi::handle_no_alloc_deleter> p(nullptr);
 	for (auto _ : state) {
+		std::friendly_unique_ptr<ficapi::opaque, ficapi::handle_no_alloc_deleter> p(nullptr);
 		ficapi_handle_no_alloc_create(phd::friendly_out_ptr(p));
 		x += ficapi_handle_get_data(p.get());
 	}
@@ -106,8 +102,7 @@ static void friendly_reset_out_ptr(benchmark::State& state) {
 		return;
 	}
 }
-BENCHMARK(friendly_reset_out_ptr)
-
+BENCHMARK(friendly_local_out_ptr)
 	->ComputeStatistics("max", &compute_max)
 	->ComputeStatistics("min", &compute_min)
 	->ComputeStatistics("dispersion", &compute_index_of_dispersion);

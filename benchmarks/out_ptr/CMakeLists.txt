@@ -1,17 +1,17 @@
 include(Common/core)
 
 set(phd_out_ptr_benchmarks_sources
-	"include/benchmarks/benchmark_compute.hpp"
-	"source/benchmark_compute.cpp"
+	"include/benchmarks/statistics.hpp"
+	"source/statistics.cpp"
 
-	"source/shared_local_out_ptr_benchmarks.cpp"
-	"source/shared_reset_out_ptr_benchmarks.cpp"
+	"source/shared_local_out_ptr.cpp"
+	"source/shared_reset_out_ptr.cpp"
 
-	"source/local_out_ptr_benchmarks.cpp"
-	"source/reset_out_ptr_benchmarks.cpp"
+	"source/local_out_ptr.cpp"
+	"source/reset_out_ptr.cpp"
 
-	"source/local_inout_ptr_benchmarks.cpp"
-	"source/reset_inout_ptr_benchmarks.cpp"
+	"source/local_inout_ptr.cpp"
+	"source/reset_inout_ptr.cpp"
 
 	"source/out_ptr_benchmarks_main.cpp"
 )
@@ -64,7 +64,7 @@ if (Python3_Interpreter_FOUND)
 			"--input_format=${PHD_OUT_PTR_BENCHMARKS_FORMAT}"
 			"--output_dir=${PHD_OUT_PTR_BENCHMARKS_GRAPH_OUTDIR}"
 			--categories ${phd_out_ptr_benchmarks_categories}
-		DEPENDS phd_out_ptr_benchmarks 
+		DEPENDS phd_out_ptr_benchmarks "${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTFILE}"
 		COMMENT "Graphing '${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTFILE}' data to '${PHD_OUT_PTR_BENCHMARKS_RESULTS_OUTDIR}'"
 	)
 endif()
