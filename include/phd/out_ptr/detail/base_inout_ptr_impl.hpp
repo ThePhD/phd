@@ -12,6 +12,16 @@
 
 namespace phd::out_ptr_detail {
 
+	template <typename Smart>
+	void call_release(std::true_type, Smart& s) {
+		s.release();
+	}
+
+	template <typename Smart>
+	void call_release(std::false_type, Smart&) {
+		static_assert(std::is_pointer_v<Smart>, "the type that does not get release called on it must be a pointer type");
+	}
+
 	template <typename Smart, typename Pointer, typename Args, typename List>
 	struct base_inout_ptr_impl : base_out_ptr_impl<Smart, Pointer, Args, List> {
 	private:
@@ -34,7 +44,7 @@ namespace phd::out_ptr_detail {
 		base_inout_ptr_impl& operator=(const base_inout_ptr_impl&) = delete;
 
 		~base_inout_ptr_impl() {
-			this->m_smart_ptr->release();
+			call_release(meta::is_releasable<Smart>(), *(this->m_smart_ptr));
 		}
 	};
 } // namespace phd::out_ptr_detail

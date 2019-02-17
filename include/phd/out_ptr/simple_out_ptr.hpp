@@ -29,14 +29,16 @@ namespace phd {
 		typename Smart,
 		typename... Args>
 	auto simple_out_ptr(Smart& p, Args&&... args) noexcept {
-		return simple_out_ptr_t<Smart, Pointer, Args...>(p, std::forward<Args>(args)...);
+		using P = simple_out_ptr_t<Smart, Pointer, Args...>;
+		return P(p, std::forward<Args>(args)...);
 	}
 
 	template <typename Smart,
 		typename... Args>
 	auto simple_out_ptr(Smart& p, Args&&... args) noexcept {
 		using Pointer = meta::pointer_of_t<Smart>;
-		return simple_out_ptr<Pointer>(p, std::forward<Args>(args)...);
+		using P = simple_out_ptr_t<Smart, Pointer, Args...>;
+		return P(p, std::forward<Args>(args)...);
 	}
 
 } // namespace phd

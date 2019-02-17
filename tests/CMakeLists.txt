@@ -1,15 +1,7 @@
+
+add_subdirectory(out_ptr)
+
 set(phd_test_sources
-	"source/out_ptr/clever_out_ptr_test.cpp"
-	"source/out_ptr/simple_out_ptr_test.cpp"
-	"source/out_ptr/out_ptr_test.cpp"
-	"source/out_ptr/customized_out_ptr_test.cpp"
-	"source/out_ptr/custom_unique_deleter_test.cpp"
-
-	"source/out_ptr/clever_inout_ptr_test.cpp"
-	"source/out_ptr/simple_inout_ptr_test.cpp"
-	"source/out_ptr/inout_ptr_test.cpp"
-	"source/out_ptr/customized_inout_ptr_test.cpp"
-
 	"source/handle/handle_test.cpp"
 
 	"source/overload/overload_basic.cpp"

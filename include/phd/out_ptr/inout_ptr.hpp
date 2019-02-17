@@ -40,7 +40,8 @@ namespace phd {
 		typename... Args>
 	auto inout_ptr(Smart& s, Args&&... args) noexcept {
 		using Pointer = meta::pointer_of_t<Smart>;
-		return inout_ptr<Pointer>(s, std::forward<Args>(args)...);
+		using P = inout_ptr_t<Smart, Pointer, Args...>;
+		return P(s, std::forward<Args>(args)...);
 	}
 
 } // namespace phd
