@@ -11,6 +11,7 @@
 #include <type_traits>
 #include <memory>
 #include <utility>
+#include <tuple>
 
 namespace phd::out_ptr_detail {
 

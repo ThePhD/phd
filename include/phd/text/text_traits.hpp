@@ -8,7 +8,6 @@
 
 namespace phd {
 
-
 } // namespace phd
 
 #endif // PHD_TEXT_TEXT_TRAITS_HPP

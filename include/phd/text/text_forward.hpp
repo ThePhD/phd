@@ -3,7 +3,22 @@
 #ifndef PHD_TEXT_TEXT_FORWARD_HPP
 #define PHD_TEXT_TEXT_FORWARD_HPP
 
+#include <phd/text/char8_t.hpp>
+
 namespace phd {
+
+	inline namespace __abi_v0 {
+	namespace __detail {
+		template <typename __CharT>
+		struct __utf8_with;
+
+		template <typename __CharT>
+		struct __utf16_with;
+
+		template <typename __CharT>
+		struct __utf32_with;
+	}
+	} // namespace __abi_v0::__detail
 
 	struct execution;
 	struct wide_execution;

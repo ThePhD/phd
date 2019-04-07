@@ -6,12 +6,12 @@
 namespace phd {
 
 	template <typename T>
-	struct code_unit {
+	struct code_unit_of {
 		using type = typename T::code_unit;
 	};
 
 	template <typename T>
-	using code_unit_t = typename code_unit<T>::type;
+	using code_unit_of_t = typename code_unit_of<T>::type;
 
 } // namespace phd
 

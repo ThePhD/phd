@@ -11,7 +11,7 @@
 
 namespace phd {
 
-	template <typename Encoding, typename NormalizationForm = nfkc, typename Container = std::basic_string<code_unit_t<Encoding>>>
+	template <typename Encoding, typename NormalizationForm = nfkc, typename Container = std::basic_string<code_unit_of_t<Encoding>>>
 	class basic_text : public basic_text_view<Encoding, NormalizationForm, Container> {
 	};
 

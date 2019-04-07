@@ -1,6 +1,9 @@
 [submodule "vendor/benchmark"]
 	path = vendor/benchmark
-	url = https://github.com/BaaMeow/benchmark.git
+url=https://github.com/google/benchmark.git
 [submodule "vendor/optional"]
 	path = vendor/optional
 	url = https://github.com/TartanLlama/optional.git
+[submodule "vendor/range-v3"]
+	path = vendor/range-v3
+	url = https://github.com/ericniebler/range-v3.git

@@ -13,8 +13,8 @@
 
 namespace phd {
 
-	struct utf8 {
-		using code_unit = char8_t;
+	struct ascii {
+		using code_unit = char;
 		using encoding_code_point = code_point;
 		using decoding_code_point = code_point;
 

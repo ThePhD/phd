@@ -49,6 +49,20 @@ target_include_directories(phd INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  
 	$<INSTALL_INTERFACE:include>
 )
+target_include_directories(phd INTERFACE 
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/range-v3/include>  
+	$<INSTALL_INTERFACE:"">
+)
+if (MSVC)
+	target_compile_options(phd INTERFACE 
+		/std:c++latest
+		/permissive-
+	)
+else()
+	target_compile_options(phd INTERFACE 
+		-std=c++2a
+	)
+endif()
 target_sources(phd INTERFACE 
 	$<BUILD_INTERFACE:${prefixed_phd_sources}>  
 	$<INSTALL_INTERFACE:${phd_sources}>

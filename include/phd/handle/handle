@@ -1,0 +1,8 @@
+#pragma once
+
+#ifndef PHD_HANDLE_HANDLE
+#define PHD_HANDLE_HANDLE
+
+#include <phd/handle/handle.hpp>
+
+#endif // PHD_HANDLE_HANDLE

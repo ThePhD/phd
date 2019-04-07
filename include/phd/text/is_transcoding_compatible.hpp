@@ -8,9 +8,15 @@
 namespace phd {
 
 	template <typename To, typename From>
-	using is_transcoding_compatible = std::integral_constant<bool, std::is_same_v<To, From> || std::is_same_v<typename To::decoding_code_point, typename From::encoding_code_point>>;
+	struct is_bitwise_transcoding_compatible : std::false_type {};
 
 	template <typename To, typename From>
+	constexpr inline bool is_bitwise_transcoding_compatible_v = is_bitwise_transcoding_compatible<To, From>::value;
+
+	template <typename From, typename To>
+	struct is_transcoding_compatible : std::integral_constant<bool, is_bitwise_transcoding_compatible_v<From, To> || std::is_same_v<To, From> || std::is_same_v<typename To::decoding_code_point, typename From::encoding_code_point>> {};
+
+	template <typename From, typename To>
 	constexpr bool is_transcoding_compatible_v = is_transcoding_compatible<To, From>::value;
 
 } // namespace phd
