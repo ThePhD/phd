@@ -9,10 +9,10 @@ namespace phd {
 
 	inline namespace __abi_v0 {
 	namespace __detail {
-		template <typename __CharT>
+		template <typename, bool, bool>
 		struct __utf8_with;
 
-		template <typename __CharT>
+		template <typename __CharT, bool>
 		struct __utf16_with;
 
 		template <typename __CharT>

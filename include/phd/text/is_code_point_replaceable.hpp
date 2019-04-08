@@ -10,10 +10,12 @@
 
 namespace phd {
 
+	inline namespace __abi_v0 {
 	namespace __text_detail {
 		template <typename T>
 		using __is_code_point_replaceable_test = decltype(T::replacement_code_point);
 	}
+	} // namespace __abi_v0::__text_detail
 
 	template <typename T>
 	struct is_code_point_replaceable : is_detected<__text_detail::__is_code_point_replaceable_test, T> {};

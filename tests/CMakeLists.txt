@@ -22,7 +22,7 @@ prepend(prefixed_phd_test_sources "${CMAKE_CURRENT_SOURCE_DIR}/" ${phd_test_sour
 add_executable(phd_test ${prefixed_phd_test_sources})
 if (MSVC)
 	target_compile_options(phd_test
-		PRIVATE /std:c++latest /utf-8)
+		PRIVATE /std:c++latest /source-charset:utf-8)
 else()
 	target_compile_options(phd_test
 		PRIVATE -std=c++2a)

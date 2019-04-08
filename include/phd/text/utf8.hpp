@@ -19,22 +19,96 @@
 namespace phd {
 	inline namespace __abi_v0 {
 	namespace __detail {
-		template <typename __CodeUnit = char8_t>
+		template <typename __CodeUnit = char8_t, bool overlong_allowed = false, bool surrogates_allowed = false>
 		struct __utf8_with {
 			using state = __detail::__empty_state;
 			using code_unit = __CodeUnit;
 			using code_point = unicode_code_point;
 
 			template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
-			static constexpr auto encode(__InputRange&& __input, __OutputRange&& __output, state& __s, __ErrorHandler&& error_handler) {
+			static constexpr auto encode(__InputRange&& __input, __OutputRange&& __output, state& __s, __ErrorHandler&& __error_handler) {
 				using __uInputRange = meta::remove_cv_ref_t<__InputRange>;
 				using __uOutputRange = meta::remove_cv_ref_t<__OutputRange>;
 				using __result_t = encoding_result<__uInputRange, __uOutputRange, state>;
 
-				static_assert(std::is_assignable_v<const code_unit&, ranges::reference_t<__InputRange>>, "the input must have a reference type which can be bound to a const code_unit&");
-				static_assert(std::is_assignable_v<ranges::reference_t<__uOutputRange>, code_point>, "the output must have a reference type which can be assigned into a code_point");
+				auto __init = ranges::cbegin(__input);
+				auto __inlast = ranges::cend(__input);
+				if (__init == __inlast) {
+					// an exhausted sequence is fine
+					return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
+				}
 
-				return __result_t(__input, __output, __s);
+				auto __outit = ranges::begin(__output);
+				auto __outlast = ranges::end(__output);
+
+				code_point codepoint = ranges::dereference(__init);
+
+				if (codepoint <= __unicode_detail::__last_1byte_value) {
+					if (__outit == __outlast) {
+						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+					ranges::dereference(__outit) = static_cast<code_unit>(codepoint);
+					__outit = ranges::next(__outit);
+				}
+				else if (codepoint <= __unicode_detail::__last_2byte_value) {
+					if (__outit == __outlast) {
+						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+					ranges::dereference(__outit) = static_cast<code_unit>(0xC0 | ((codepoint & 0x7C0) >> 6));
+					__outit = ranges::next(__outit);
+
+					if (__outit == __outlast) {
+						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+					ranges::dereference(__outit) = static_cast<code_unit>(0x80 | (codepoint & 0x3F));
+					__outit = ranges::next(__outit);
+				}
+				else if (codepoint <= __unicode_detail::__last_3byte_value) {
+					if (__outit == __outlast) {
+						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+					ranges::dereference(__outit) = static_cast<code_unit>(0xE0 | ((codepoint & 0xF000) >> 12));
+					__outit = ranges::next(__outit);
+
+					if (__outit == __outlast) {
+						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+					ranges::dereference(__outit) = static_cast<code_unit>(0x80 | ((codepoint & 0xFC0) >> 6));
+					__outit = ranges::next(__outit);
+
+					if (__outit == __outlast) {
+						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+					ranges::dereference(__outit) = static_cast<code_unit>(0x80 | (codepoint & 0x3F));
+					__outit = ranges::next(__outit);
+				}
+				else {
+					if (__outit == __outlast) {
+						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+					ranges::dereference(__outit) = static_cast<code_unit>(0xF0 | ((codepoint & 0x1C0000) >> 18));
+					__outit = ranges::next(__outit);
+
+					if (__outit == __outlast) {
+						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+					ranges::dereference(__outit) = static_cast<code_unit>(0xE0 | ((codepoint & 0xF000) >> 12));
+					__outit = ranges::next(__outit);
+
+					if (__outit == __outlast) {
+						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+					ranges::dereference(__outit) = static_cast<code_unit>(0x80 | ((codepoint & 0xFC0) >> 6));
+					__outit = ranges::next(__outit);
+
+					if (__outit == __outlast) {
+						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+					ranges::dereference(__outit) = static_cast<code_unit>(0x80 | (codepoint & 0x3F));
+					__outit = ranges::next(__outit);
+				}
+
+				return __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::ok);
 			}
 
 			template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
@@ -43,8 +117,8 @@ namespace phd {
 				using __uOutputRange = typename meta::remove_cv_ref<__OutputRange>::type;
 				using __result_t = decoding_result<__uInputRange, __uOutputRange, state>;
 
-				auto __init = ranges::begin(__input);
-				auto __inlast = ranges::end(__input);
+				auto __init = ranges::cbegin(__input);
+				auto __inlast = ranges::cend(__input);
 
 				if (__init == __inlast) {
 					// the empty sequence is an OK sequence
@@ -64,12 +138,12 @@ namespace phd {
 					}
 					else {
 						ranges::dereference(__outit) = static_cast<code_point>(b0);
-						return __result_t(__InputRange(__init, __inlast), __OutputRange(__outit, __outlast), __s);
+						return __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s);
 					}
 				}
 				const bool __is_invalid_cu = __unicode_detail::__is_invalid(static_cast<unsigned char>(b0));
 				if (__is_invalid_cu || __unicode_detail::__is_continuation(static_cast<unsigned char>(b0))) {
-					return __error_handler(__utf8_with{}, __result_t(__InputRange(__init, __inlast), __OutputRange(__outit, __outlast), __s, __is_invalid_cu ? encoding_errc::invalid_sequence : encoding_errc::invalid_leading_sequence));
+					return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, __is_invalid_cu ? encoding_errc::invalid_sequence : encoding_errc::invalid_leading_sequence));
 				}
 
 				__init = ranges::next(__init);
@@ -78,7 +152,7 @@ namespace phd {
 				for (std::size_t i = 1; i < length; ++i) {
 					b[i] = ranges::dereference(__init);
 					if (!__unicode_detail::__is_continuation(b[i])) {
-						return __error_handler(__utf8_with{}, __result_t(__InputRange(__init, __inlast), __OutputRange(__outit, __outlast), __s, encoding_errc::invalid_trailing_sequence));
+						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_trailing_sequence));
 					}
 					__init = ranges::next(__init);
 				}
@@ -97,19 +171,19 @@ namespace phd {
 				}
 
 				if (__unicode_detail::__is_overlong(__decoded, length)) {
-					return __error_handler(__utf8_with{}, __result_t(__InputRange(__init, __inlast), __OutputRange(__outit, __outlast), __s, encoding_errc::overlong_sequence));
+					return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::overlong_sequence));
 				}
 				if (__unicode_detail::__is_surrogate(__decoded) || __decoded > __unicode_detail::__last_code_point) {
-					return __error_handler(__utf8_with{}, __result_t(__InputRange(__init, __inlast), __OutputRange(__outit, __outlast), __s, encoding_errc::invalid_output));
+					return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_output));
 				}
 
 				if (__outit == __outlast) {
-					return __error_handler(__utf8_with{}, __result_t(__InputRange(__init, __inlast), __OutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 				}
 				// then everything is fine
 				ranges::dereference(__outit) = __decoded;
 				__outit = ranges::next(__outit);
-				return __result_t(__InputRange(__init, __inlast), __OutputRange(__outit, __outlast), __s);
+				return __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s);
 			}
 		};
 	}

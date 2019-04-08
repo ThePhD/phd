@@ -21,10 +21,10 @@ struct my_stateful_int_deleter {
 
 	void operator()(const int& h) const {
 		if (h < the_null_value) {
-			std::cout << "Less than the null value on deletion" << std::endl;
+			INFO("Less than the null value on deletion");
 		}
 		else {
-			std::cout << "More than or equal to the null value on deletion" << std::endl;
+			INFO("More than or equal to the null value on deletion");
 		}
 	}
 };

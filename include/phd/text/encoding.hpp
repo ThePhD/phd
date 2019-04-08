@@ -12,17 +12,13 @@
 
 #include <phd/text/text_traits.hpp>
 #include <phd/text/error_handler.hpp>
+#include <phd/text/encode.hpp>
+#include <phd/text/decode.hpp>
 
 namespace phd {
 
 	template <>
 	struct is_bitwise_transcoding_compatible<ascii, utf8> : std::true_type {};
-
-	/* TODO: when latin1 and other ASCII-extending compatible
-	encodings are implemented
-	template <>
-	struct is_bitwise_transcoding_compatible<ascii, latin-X> : std::true_type {};
-	*/
 
 } // namespace phd
 

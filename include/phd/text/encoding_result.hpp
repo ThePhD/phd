@@ -22,8 +22,8 @@ namespace phd {
 		encoding_errc error_code;
 
 		template <typename __InRange, typename __OutRange, typename __EncodingState>
-		constexpr encoding_result(__InRange&& __in, __OutRange&& __out, __EncodingState&& __state, encoding_errc __error_code = encoding_errc::ok)
-		: input(std::forward<__InRange>(__in)), output(std::forward<__OutRange>(__out)), state(std::forward<__EncodingState>(__state)), error_code(__error_code) {
+		constexpr encoding_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code = encoding_errc::ok)
+		: input(std::forward<__InRange>(__input)), output(std::forward<__OutRange>(__output)), state(std::forward<__EncodingState>(__state)), error_code(__error_code) {
 		}
 
 		// TODO: when the standard catches up

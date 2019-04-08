@@ -10,6 +10,7 @@
 
 namespace phd {
 
+	inline namespace __abi_v0 {
 	namespace __text_detail {
 		template <typename T>
 		using __is_encode_lossless_test = decltype(T::is_encode_lossless);
@@ -22,7 +23,8 @@ namespace phd {
 
 		template <typename T>
 		struct __is_full_range_representable_sfinae<T, std::enable_if_t<is_detected_v<__is_decode_lossless_test, T> && is_detected_v<__is_encode_lossless_test, T>>> : std::integral_constant<bool, T::is_encode_lossless::value && T::is_decode_lossless::value> {};
-	} // namespace __text_detail
+	}
+	} // namespace __abi_v0::__text_detail
 
 	template <typename T>
 	struct is_full_range_representable : __text_detail::__is_full_range_representable_sfinae<T> {};

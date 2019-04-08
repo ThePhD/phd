@@ -9,7 +9,7 @@ namespace phd {
 
 	inline namespace __abi_v0 {
 	namespace __detail {
-		template <typename __CodeUnit = char16_t>
+		template <typename __CodeUnit = char16_t, bool surrogates_allowed = false>
 		struct __utf16_with {
 			using state = __detail::__empty_state;
 			using code_unit = __CodeUnit;
