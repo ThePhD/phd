@@ -15,17 +15,7 @@ namespace phd {
 
 	struct ascii {
 		using code_unit = char;
-		using encoding_code_point = code_point;
-		using decoding_code_point = code_point;
-
-		static std::pair<std::array<code_unit, 8>, std::size_t> encode_one(encoding_code_point u){
-
-		};
-
-		template <typename Range>
-		static std::pair<decoding_code_point, Range> decode_one(Range r){
-
-		};
+		using code_point = unicode_code_point;
 	};
 } // namespace phd
 

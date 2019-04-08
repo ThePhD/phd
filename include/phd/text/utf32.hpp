@@ -10,20 +10,9 @@ namespace phd {
 	namespace __detail {
 		template <typename __CodeUnit = char32_t>
 		struct __utf32_with {
+			using state = __detail::__empty_state;
 			using code_unit = __CodeUnit;
-			using decoded_code_unit = unicode_code_point;
-
-			template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
-			static constexpr encoding_result<__InputRange, __OutputRange> encode(__InputRange&& input, __OutputRange&& output, __ErrorHandler&& error_handler) {
-				static_assert(std::is_assignable_v<const code_unit&, ranges::reference_t<__InputRange>>, "the input must have a reference type which can be bound to a const code_unit&");
-				static_assert(std::is_assignable_v<ranges::reference_t<__OutputRange>, decoded_code_unit>, "the input must have a reference type which can be bound to a const code_unit&");
-				return encoding_result<std::remove_cvref_t<__InputRange>, std::remove_cvref_t<__OutputRange>>(input, output);
-			}
-
-			template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
-			static constexpr encoding_result<__InputRange, __OutputRange> decode(__InputRange&& __input, __OutputRange&& __output, __ErrorHandler&& __error_handler) {
-				return encoding_result<std::remove_cvref_t<__InputRange>, std::remove_cvref_t<__OutputRange>>(__input, __output);
-			}
+			using code_point = unicode_code_point;
 		};
 	}
 	} // namespace __abi_v0::__detail

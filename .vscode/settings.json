@@ -2,6 +2,7 @@
 	"python.formatting.provider": "yapf",
 	"python.pythonPath": "C:\\Python37\\python.exe",
 	"files.associations": {
+		"*.latex": "latex",
 		"xtr1common": "cpp",
 		"type_traits": "cpp",
 		"algorithm": "cpp",
@@ -73,7 +74,13 @@
 		"mutex": "cpp",
 		"numeric": "cpp",
 		"xthread": "cpp",
-		"thread": "cpp"
+		"thread": "cpp",
+		"complex": "cpp",
+		"deque": "cpp",
+		"forward_list": "cpp",
+		"queue": "cpp",
+		"stack": "cpp",
+		"unordered_set": "cpp"
 	},
 	"cmake.autoRestartBuild": true,
 	"cmake.saveBeforeBuild": true,

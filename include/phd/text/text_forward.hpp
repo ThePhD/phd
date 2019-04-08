@@ -17,8 +17,16 @@ namespace phd {
 
 		template <typename __CharT>
 		struct __utf32_with;
+
+		struct __empty_state;
 	}
 	} // namespace __abi_v0::__detail
+
+	using unicode_code_point = char32_t;
+	using unicode_scalar_value = char32_t;
+
+	template <typename>
+	struct locale_state;
 
 	struct execution;
 	struct wide_execution;

@@ -8,7 +8,7 @@
 
 namespace phd {
 
-	template <typename Encoding, typename NormalizationForm = nfkc, typename Iterable = basic_c_string_view<code_unit_t<Encoding>>>
+	template <typename Encoding, typename NormalizationForm = nfkc, typename Iterable = basic_c_string_view<encoding_code_unit_t<Encoding>>>
 	class basic_text_view {
 	public:
 		using encoding_type = Encoding;

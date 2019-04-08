@@ -6,7 +6,7 @@
 #include <phd/text/basic_c_string_view.hpp>
 #include <phd/text/char8_t.hpp>
 
-namespace phd::text {
+namespace phd {
 
 	using c_string_view = basic_c_string_view<char>;
 	using wc_string_view = basic_c_string_view<wchar_t>;
@@ -40,6 +40,6 @@ namespace phd::text {
 		}
 	}} // namespace literals::string_view_literals
 
-} // namespace phd::text
+} // namespace phd
 
 #endif // PHD_TEXT_C_STRING_VIEW_HPP

@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef PHD_TEXT_encoding_errc_HPP
-#define PHD_TEXT_encoding_errc_HPP
+#ifndef PHD_TEXT_ENCODING_ERROR_HPP
+#define PHD_TEXT_ENCODING_ERROR_HPP
 
 #include <phd/text/char8_t.hpp>
 #include <phd/text/unicode_code_point.hpp>
@@ -10,20 +10,28 @@
 #include <cstddef>
 #include <system_error>
 #include <type_traits>
-#include <string_view>
+#include <string>
 #include <exception>
 
 namespace phd {
 inline namespace __abi_v0 {
 
 	enum class encoding_errc : int {
-		ok = 0x00, // just fine
+		// just fine
+		ok = 0x00,
+		// input contains ill-formed sequences
 		invalid_sequence = 0x01,
-		incomplete_sequence = 0x02,	  // input contains incomplete/ill-formed sequences
-		overlong_sequence = 0x03,	    // input contains overlong encoding sequence (e.g. for utf8)
-		insufficient_output_space = 0x04, // output cannot receive all the completed code units
-		invalid_output = 0x05,		    // sequence can be encoded but resuulting code point is invalid (e.g., encodes a lone surrogate)
+		// input contains incomplete sequences
+		incomplete_sequence = 0x02,
+		// input contains overlong encoding sequence (e.g. for utf8)
+		overlong_sequence = 0x03,
+		// output cannot receive all the completed code units
+		insufficient_output_space = 0x04,
+		// sequence can be encoded but resuulting code point is invalid (e.g., encodes a lone surrogate)
+		invalid_output = 0x05,
+		// leading code unit is wrong
 		invalid_leading_sequence = 0x06,
+		// leading code units were correct, trailing code units were wrong
 		invalid_trailing_sequence = 0x07
 	};
 
@@ -40,7 +48,7 @@ inline namespace __abi_v0 {
 #endif
 
 		virtual const char* name() const noexcept override {
-			return "encoding_category_t (__abi_v0)";
+			return "encoding_error_category (__abi_v0)";
 		}
 
 		virtual std::string message(int condition) const override {
@@ -89,7 +97,7 @@ inline namespace __abi_v0 {
 #endif
 
 	inline std::error_condition make_error_condition(encoding_errc e) noexcept {
-		return std::error_condition(static_cast<int>(e), encoding_category());
+		return std::error_condition(static_cast<int>(e), encoding_error_category());
 	}
 }
 } // namespace phd::__abi_v0
@@ -99,4 +107,4 @@ namespace std {
 	struct is_error_condition_enum<::phd::encoding_errc> : std::true_type {};
 } // namespace std
 
-#endif // PHD_TEXT_encoding_errc_HPP
+#endif // PHD_TEXT_ENCODING_ERROR_HPP

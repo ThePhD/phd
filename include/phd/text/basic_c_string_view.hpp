@@ -14,75 +14,100 @@
 
 namespace phd {
 
-	namespace string_detail {
+	namespace __string_detail {
 #ifdef __cpp_char8_t
 #else
 		using arr8_t = char8_t[1];
-		constexpr inline const arr8_t u8_shim = {};
+		constexpr inline const arr8_t __u8_shim = {};
 #endif
 
 		template <typename C>
-		constexpr inline decltype(auto) empty_string() noexcept {
+		constexpr inline decltype(auto) __empty_string() noexcept {
 			static_assert(meta::always_false_v<C>, "unrecognized character type");
 			return "";
 		}
 
 		template <>
-		constexpr inline decltype(auto) empty_string<char>() noexcept {
+		constexpr inline decltype(auto) __empty_string<char>() noexcept {
 			return "";
 		}
 
 		template <>
-		constexpr inline decltype(auto) empty_string<wchar_t>() noexcept {
+		constexpr inline decltype(auto) __empty_string<wchar_t>() noexcept {
 			return L"";
 		}
 
 		template <>
-		constexpr inline decltype(auto) empty_string<char8_t>() noexcept {
+		constexpr inline decltype(auto) __empty_string<char8_t>() noexcept {
 #ifdef __cpp_char8_t
 			return u8"";
 #else
-			return (u8_shim);
+			return (__u8_shim);
 #endif
 		}
 
 		template <>
-		constexpr inline decltype(auto) empty_string<char16_t>() noexcept {
+		constexpr inline decltype(auto) __empty_string<char16_t>() noexcept {
 			return u"";
 		}
 
 		template <>
-		constexpr inline decltype(auto) empty_string<char32_t>() noexcept {
+		constexpr inline decltype(auto) __empty_string<char32_t>() noexcept {
 			return U"";
 		}
-	} // namespace string_detail
+	} // namespace __string_detail
 
 	template <typename CharType, typename Traits = std::char_traits<CharType>>
 	class basic_c_string_view : public std::basic_string_view<CharType, Traits> {
 	private:
 		using base_t = std::basic_string_view<CharType, Traits>;
 
+		constexpr bool last_element_check() const {
+			return ((this->size() > 0) ? *(this->data() + this->size()) == '\0' : true);
+		}
+
 	public:
+		using base_t::const_iterator;
+		using base_t::const_pointer;
+		using base_t::const_reverse_iterator;
+		using base_t::difference_type;
+		using base_t::iterator;
+		using base_t::pointer;
+		using base_t::reference;
+		using base_t::reverse_iterator;
+		using base_t::size_type;
+		using base_t::traits_type;
+		using base_t::value_type;
+
 		constexpr basic_c_string_view()
-		: basic_c_string_view(string_detail::empty_string<CharType>(), 0) {
+		: basic_c_string_view(__string_detail::__empty_string<CharType>(), 0) {
 		}
 
-		template <typename Arg0, typename Arg1, typename... Args>
-		constexpr basic_c_string_view(Arg0&& arg0_, Arg1&& arg1_, Args&&... args_)
-		: base_t(std::forward<Arg0>(arg0_), std::forward<Arg1>(arg1_), std::forward<Args>(args_)...) {
-			assert((this->data() ? *(this->data() + this->size()) == '\0' : false) && "non null-terminated c_string_view!");
+		constexpr basic_c_string_view(const_iterator __arg0_, const_iterator __arg1_)
+#if defined(_ITERATOR_DEBUG_LEVEL) && _ITERATOR_DEBUG_LEVEL >= 1
+		: base_t(__arg0_ == __arg1_ ? __string_detail::__empty_string<CharType>() : std::addressof(*__arg0_), std::distance(__arg0_, __arg1_)) {
+#else
+		: base_t(std::addressof(*__arg0_), std::distance(__arg0_, __arg1_)) {
+#endif
+			assert(this->last_element_check() && "non null-terminated c_string_view!");
 		}
 
-		template <typename Arg, typename = std::enable_if_t<!std::is_same_v<meta::remove_cv_ref_t<Arg>, basic_c_string_view>>>
-		constexpr basic_c_string_view(Arg&& arg_)
-		: base_t(std::forward<Arg>(arg_)) {
-			assert((this->data() ? *this->end() == '\0' : false) && "non null-terminated c_string_view!");
+		template <typename __Arg0, typename __Arg1, typename... __Args, typename = std::enable_if_t<!std::disjunction_v<std::is_same<meta::remove_cv_ref_t<__Arg0>, iterator>, std::is_same<meta::remove_cv_ref_t<__Arg0>, const_iterator>>>>
+		constexpr basic_c_string_view(__Arg0&& __arg0_, __Arg1&& __arg1_, __Args&&... __args_)
+		: base_t(std::forward<__Arg0>(__arg0_), std::forward<__Arg1>(__arg1_), std::forward<__Args>(__args_)...) {
+			assert(this->last_element_check() && "non null-terminated c_string_view!");
 		}
 
-		constexpr basic_c_string_view(basic_c_string_view&& o) = default;
-		constexpr basic_c_string_view(const basic_c_string_view& o) = default;
-		constexpr basic_c_string_view& operator=(basic_c_string_view&& o) = default;
-		constexpr basic_c_string_view& operator=(const basic_c_string_view& o) = default;
+		template <typename __Arg, typename = std::enable_if_t<!std::is_same_v<meta::remove_cv_ref_t<__Arg>, basic_c_string_view>>>
+		constexpr basic_c_string_view(__Arg&& __arg_)
+		: base_t(std::forward<__Arg>(__arg_)) {
+			assert(this->last_element_check() && "non null-terminated c_string_view!");
+		}
+
+		constexpr basic_c_string_view(basic_c_string_view&&) = default;
+		constexpr basic_c_string_view(const basic_c_string_view&) = default;
+		constexpr basic_c_string_view& operator=(basic_c_string_view&&) = default;
+		constexpr basic_c_string_view& operator=(const basic_c_string_view&) = default;
 	};
 
 } // namespace phd

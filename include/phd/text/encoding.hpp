@@ -11,6 +11,7 @@
 #include <phd/text/utf32.hpp>
 
 #include <phd/text/text_traits.hpp>
+#include <phd/text/error_handler.hpp>
 
 namespace phd {
 
