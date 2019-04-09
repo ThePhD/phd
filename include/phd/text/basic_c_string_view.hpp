@@ -67,20 +67,20 @@ namespace phd {
 		}
 
 	public:
-		using base_t::const_iterator;
-		using base_t::const_pointer;
-		using base_t::const_reverse_iterator;
-		using base_t::difference_type;
-		using base_t::iterator;
-		using base_t::pointer;
-		using base_t::reference;
-		using base_t::reverse_iterator;
-		using base_t::size_type;
-		using base_t::traits_type;
-		using base_t::value_type;
+		using const_iterator = typename base_t::const_iterator;
+		using const_pointer = typename base_t::const_pointer;
+		using const_reverse_iterator = typename base_t::const_reverse_iterator;
+		using difference_type = typename base_t::difference_type;
+		using iterator = typename base_t::iterator;
+		using pointer = typename base_t::pointer;
+		using reference = typename base_t::reference;
+		using reverse_iterator = typename base_t::reverse_iterator;
+		using size_type = typename base_t::size_type;
+		using traits_type = typename base_t::traits_type;
+		using value_type = typename base_t::value_type;
 
 		constexpr basic_c_string_view()
-		: basic_c_string_view(__string_detail::__empty_string<CharType>(), 0) {
+		: basic_c_string_view(static_cast<const_pointer>(__string_detail::__empty_string<CharType>()), static_cast<size_type>(0)) {
 		}
 
 		constexpr basic_c_string_view(const_iterator __arg0_, const_iterator __arg1_)
@@ -92,7 +92,7 @@ namespace phd {
 			assert(this->last_element_check() && "non null-terminated c_string_view!");
 		}
 
-		template <typename __Arg0, typename __Arg1, typename... __Args, typename = std::enable_if_t<!std::disjunction_v<std::is_same<meta::remove_cv_ref_t<__Arg0>, iterator>, std::is_same<meta::remove_cv_ref_t<__Arg0>, const_iterator>>>>
+		template <typename __Arg0, typename __Arg1, typename... __Args, typename = std::enable_if_t<!(std::disjunction_v<std::is_same<meta::remove_cv_ref_t<__Arg0>, iterator>, std::is_same<meta::remove_cv_ref_t<__Arg0>, const_iterator>> && std::disjunction_v<std::is_same<meta::remove_cv_ref_t<__Arg1>, iterator>, std::is_same<meta::remove_cv_ref_t<__Arg1>, const_iterator>>)>>
 		constexpr basic_c_string_view(__Arg0&& __arg0_, __Arg1&& __arg1_, __Args&&... __args_)
 		: base_t(std::forward<__Arg0>(__arg0_), std::forward<__Arg1>(__arg1_), std::forward<__Args>(__args_)...) {
 			assert(this->last_element_check() && "non null-terminated c_string_view!");

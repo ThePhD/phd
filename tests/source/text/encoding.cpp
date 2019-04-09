@@ -7,6 +7,8 @@
 #include <iostream>
 
 TEST_CASE("text/encoding/core", "basic usages of encoding do not explode") {
+	constexpr const std::size_t encode_output_max = 16;
+	constexpr const std::size_t decode_output_max = 2;
 	constexpr const char32_t u32_unicode_truth[] = U"♥";
 	constexpr const char16_t u16_unicode_truth[] = u"♥";
 	constexpr const char8_t u8_unicode_truth[] = u8"♥";
@@ -24,7 +26,7 @@ TEST_CASE("text/encoding/core", "basic usages of encoding do not explode") {
 			phd::execution enc;
 
 			const auto& input = ansi_truth;
-			phd::unicode_code_point output[2]{};
+			phd::unicode_code_point output[decode_output_max]{};
 			phd::execution::state s{};
 			auto dres = enc.decode(phd::c_string_view(input), ranges::span(output, 1), s, phd::default_text_error_handler{});
 			REQUIRE(dres.error_code == phd::encoding_errc::ok);
@@ -35,7 +37,7 @@ TEST_CASE("text/encoding/core", "basic usages of encoding do not explode") {
 			phd::wide_execution enc;
 
 			const auto& input = w_ansi_truth;
-			phd::unicode_code_point output[2]{};
+			phd::unicode_code_point output[decode_output_max]{};
 			phd::wide_execution::state s{};
 			auto dres = enc.decode(phd::wc_string_view(input), ranges::span(output, 1), s, phd::default_text_error_handler{});
 			REQUIRE(dres.error_code == phd::encoding_errc::ok);
@@ -46,7 +48,7 @@ TEST_CASE("text/encoding/core", "basic usages of encoding do not explode") {
 			phd::utf8 enc;
 
 			const auto& input = u8_unicode_truth;
-			phd::unicode_code_point output[2]{};
+			phd::unicode_code_point output[decode_output_max]{};
 			phd::utf8::state s{};
 			auto dres = enc.decode(phd::u8c_string_view(input), ranges::span(output, 1), s, phd::default_text_error_handler{});
 			REQUIRE(dres.error_code == phd::encoding_errc::ok);
@@ -54,15 +56,33 @@ TEST_CASE("text/encoding/core", "basic usages of encoding do not explode") {
 			REQUIRE(phd::u32c_string_view(output) == u32_unicode_truth);
 		}
 		SECTION("char16_t") {
+			phd::utf16 enc;
+
+			const auto& input = u16_unicode_truth;
+			phd::unicode_code_point output[decode_output_max]{};
+			phd::utf16::state s{};
+			auto dres = enc.decode(phd::u16c_string_view(input), ranges::span(output, 1), s, phd::default_text_error_handler{});
+			REQUIRE(dres.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(dres.error());
+			REQUIRE(phd::u32c_string_view(output) == u32_unicode_truth);
 		}
 		SECTION("char32_t") {
+			phd::utf32 enc;
+
+			const auto& input = u32_unicode_truth;
+			phd::unicode_code_point output[decode_output_max]{};
+			phd::utf32::state s{};
+			auto dres = enc.decode(phd::u32c_string_view(input), ranges::span(output, 1), s, phd::default_text_error_handler{});
+			REQUIRE(dres.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(dres.error());
+			REQUIRE(phd::u32c_string_view(output) == u32_unicode_truth);
 		}
 	}
 	SECTION("encode") {
 		SECTION("char") {
 			phd::execution enc;
 
-			char output[8]{};
+			char output[encode_output_max]{};
 			phd::execution::state s{};
 			auto dres = enc.encode(phd::u32c_string_view(u32_ansi_truth), ranges::span(output, 7), s, phd::default_text_error_handler{});
 			REQUIRE(dres.error_code == phd::encoding_errc::ok);
@@ -72,7 +92,7 @@ TEST_CASE("text/encoding/core", "basic usages of encoding do not explode") {
 		SECTION("wchar_t") {
 			phd::wide_execution enc;
 
-			wchar_t output[8]{};
+			wchar_t output[encode_output_max]{};
 			phd::wide_execution::state s{};
 			auto dres = enc.encode(phd::u32c_string_view(u32_ansi_truth), ranges::span(output, 7), s, phd::default_text_error_handler{});
 			REQUIRE(dres.error_code == phd::encoding_errc::ok);
@@ -82,7 +102,7 @@ TEST_CASE("text/encoding/core", "basic usages of encoding do not explode") {
 		SECTION("char8_t") {
 			phd::utf8 enc;
 
-			char8_t output[4]{};
+			char8_t output[encode_output_max]{};
 			phd::utf8::state s{};
 			auto dres = enc.encode(phd::u32c_string_view(u32_unicode_truth), ranges::span(output, 3), s, phd::default_text_error_handler{});
 			REQUIRE(dres.error_code == phd::encoding_errc::ok);
@@ -90,10 +110,24 @@ TEST_CASE("text/encoding/core", "basic usages of encoding do not explode") {
 			REQUIRE(phd::u8c_string_view(output) == u8_unicode_truth);
 		}
 		SECTION("char16_t") {
+			phd::utf16 enc;
+
+			char16_t output[encode_output_max]{};
+			phd::utf16::state s{};
+			auto dres = enc.encode(phd::u32c_string_view(u32_unicode_truth), ranges::span(output, 3), s, phd::default_text_error_handler{});
+			REQUIRE(dres.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(dres.error());
+			REQUIRE(phd::u16c_string_view(output) == u16_unicode_truth);
 		}
 		SECTION("char32_t") {
+			phd::utf32 enc;
+
+			char32_t output[encode_output_max]{};
+			phd::utf32::state s{};
+			auto dres = enc.encode(phd::u32c_string_view(u32_unicode_truth), ranges::span(output, 3), s, phd::default_text_error_handler{});
+			REQUIRE(dres.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(dres.error());
+			REQUIRE(phd::u32c_string_view(output) == u32_unicode_truth);
 		}
-	}
-	SECTION("transcode") {
 	}
 }

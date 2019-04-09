@@ -8,19 +8,19 @@
 namespace phd {
 
 	inline namespace __abi_v0 {
-	namespace __detail {
-		template <typename, bool, bool>
+	namespace __text_detail {
+		template <typename, typename, bool, bool>
 		struct __utf8_with;
 
-		template <typename __CharT, bool>
+		template <typename, typename, bool>
 		struct __utf16_with;
 
-		template <typename __CharT>
+		template <typename, typename, bool>
 		struct __utf32_with;
 
 		struct __empty_state;
 	}
-	} // namespace __abi_v0::__detail
+	} // namespace __abi_v0::__text_detail
 
 	using unicode_code_point = char32_t;
 	using unicode_scalar_value = char32_t;

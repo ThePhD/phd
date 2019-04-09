@@ -7,6 +7,14 @@
 #include <phd/text/execution.hpp>
 #include <phd/text/error_handler.hpp>
 #include <phd/text/c_string_view.hpp>
+#include <phd/text/detail/windows.hpp>
+
+#include <range/v3/core.hpp>
+#include <range/v3/begin_end.hpp>
+#include <range/v3/range_traits.hpp>
+#include <range/v3/span.hpp>
+
+#include <phd/meta/remove_cv_ref.hpp>
 
 #include <cuchar>
 #include <cwchar>
@@ -14,6 +22,7 @@
 #include <wchar.h>
 #endif
 #include <utility>
+#include <iterator>
 
 namespace phd {
 
@@ -45,11 +54,7 @@ namespace phd {
 			auto __outit = ranges::cbegin(__output);
 			auto __outlast = ranges::cend(__output);
 
-			if (__outit == __outlast) {
-				return __error_handler(wide_execution{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
-			}
-
-			static constexpr const std::size_t __state_max = 32;
+			constexpr const std::size_t __state_max = 32;
 			char __pray_for_state[__state_max + 1];
 			char* __pray_start = &__pray_for_state[0];
 
@@ -59,9 +64,23 @@ namespace phd {
 				return __error_handler(wide_execution{}, __result_t(std::move(__result.input), __uOutputRange(__outit, __outlast), __s, __result.error_code));
 			}
 
+#ifdef _WIN32
+			auto __current_input = std::string_view(__pray_start, std::distance(__pray_start, __result.output.data()));
+			code_unit __units[8];
+			int __res = phd::windows::MultiByteToWideChar(CP_ACP, 0, __current_input.data(), static_cast<int>(__current_input.size()), __units, 8);
+			if (__res == 0) {
+				return __error_handler(wide_execution{}, __result_t(std::move(__result.input), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_sequence));
+			}
+			for (auto __unit_it = __units; __res-- > 0; ++__unit_it) {
+				if (__outit == __outlast) {
+					return __error_handler(wide_execution{}, __result_t(std::move(__result.input), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+				}
+				ranges::dereference(__outit) = ranges::dereference(__unit_it);
+				__outit = ranges::next(__outit);
+			}
+#else
 			auto __current_input = ranges::span(__pray_start, std::distance(__pray_start, __result.output.data()));
 			code_unit __unit;
-			const code_point codepoint = ranges::dereference(__init);
 			std::size_t __res = std::mbrtowc(&__unit, __current_input.data(), __current_input.size(), std::addressof(__s.wide_state));
 			if (__res == static_cast<std::size_t>(-1)) {
 				// error: cry about it
@@ -71,14 +90,9 @@ namespace phd {
 				// incomplete sequence
 				return __error_handler(wide_execution{}, __result_t(std::move(__result.input), __uOutputRange(__outit, __outlast), __s, encoding_errc::incomplete_sequence));
 			}
-
-			for (auto __prayit = __pray_for_state; __res-- > 0;) {
-				ranges::dereference(__outit) = ranges::dereference(__prayit);
-				__outit = ranges::next(__outit);
-				if (__outit == __outlast) {
-					return __error_handler(wide_execution{}, __result_t(std::move(__result.input), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
-				}
-			}
+			ranges::dereference(__outit) = __unit;
+			__outit = ranges::next(__outit);
+#endif // Windows shit
 
 			return __result_t(std::move(__result.input), __uOutputRange(__outit, __outlast), __s, __result.error_code);
 		}
@@ -101,11 +115,11 @@ namespace phd {
 			auto __outlast = ranges::cend(__output);
 
 			if (__outit == __outlast) {
-				return __error_handler(wide_execution{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+				return __error_handler(wide_execution{}, __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::insufficient_output_space));
 			}
 
 			/*NOT A CONSTANT: MB_CUR_MAX * 4*/
-			static constexpr const std::size_t __state_max = 32;
+			constexpr const std::size_t __state_max = 32;
 			char __pray_for_state[__state_max + 1]{};
 			std::size_t __state_count = 0;
 			for (; __init != __inlast && __state_count < __state_max;) {
@@ -136,21 +150,15 @@ namespace phd {
 					__init = ranges::next(__init);
 					continue;
 				}
+
 				__state_count += __res;
-				for (auto __prayit = __pray_for_state; __res-- > 0;) {
-					if (__outit == __outlast) {
-						return __error_handler(wide_execution{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
-					}
-					ranges::dereference(__outit) = ranges::dereference(__prayit);
-					__outit = ranges::next(__outit);
-				}
 				break;
 			}
 
 			execution __exec{};
 			auto __result = __exec.decode(c_string_view(__pray_for_state, __state_count), std::forward<__OutputRange>(__output), __s.narrow_state, __text_detail::__pass_through_text_error_handler{});
 			if (__result.error_code != encoding_errc::ok) {
-				return __error_handler(wide_execution{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, __result.error_code));
+				return __error_handler(wide_execution{}, __result_t(__uInputRange(__init, __inlast), std::move(__result.output), __s, __result.error_code));
 			}
 			return __result_t(__uInputRange(__init, __inlast), std::move(__result.output), __s, __result.error_code);
 		}

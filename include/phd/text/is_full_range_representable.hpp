@@ -18,7 +18,7 @@ namespace phd {
 		template <typename T>
 		using __is_decode_lossless_test = decltype(T::is_decode_lossless);
 
-		template <typename, typename>
+		template <typename, typename = void>
 		struct __is_full_range_representable_sfinae : std::false_type {};
 
 		template <typename T>

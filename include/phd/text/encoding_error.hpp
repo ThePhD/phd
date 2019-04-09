@@ -78,21 +78,20 @@ inline namespace __abi_v0 {
 		}
 	};
 
-#ifdef _MSC_VER
-#else
+#if 0
 	namespace __detail {
 		constexpr const encoding_error_category __encoding_error_category = encoding_error_category{};
 	}
 #endif
 
-#ifdef _MSC_VER
+#if 0
+	inline constexpr const std::error_category& encoding_category() {
+		return __detail::__encoding_error_category;
+	}
+#else
 	inline const std::error_category& encoding_category() {
 		static const encoding_error_category __val = encoding_error_category{};
 		return __val;
-	}
-#else
-	inline constexpr const std::error_category& encoding_category() {
-		return __detail::__encoding_error_category;
 	}
 #endif
 

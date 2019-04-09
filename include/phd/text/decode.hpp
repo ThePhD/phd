@@ -7,6 +7,9 @@
 #include <phd/text/error_handler.hpp>
 #include <phd/text/state.hpp>
 
+#include <range/v3/core.hpp>
+#include <range/v3/empty.hpp>
+
 namespace phd {
 
 	template <typename __Input, typename __Output, typename __Encoding, typename __State, typename __ErrorHandler>
@@ -32,7 +35,7 @@ namespace phd {
 		using __code_point = encoding_code_point_t<__uEncoding>;
 
 		std::basic_string<__code_point> __output{};
-		if constexpr (ranges::SizedRange<__Input>) {
+		if constexpr (ranges::SizedRange<__Input>::value) {
 			// NOTE: any ol' estimate will do
 			__output.reserve(ranges::size(__input) / 2);
 		}

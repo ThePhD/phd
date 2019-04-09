@@ -9,6 +9,8 @@
 #include <phd/text/encoding_result.hpp>
 #include <phd/text/empty_state.hpp>
 
+#include <range/v3/core.hpp>
+#include <range/v3/empty.hpp>
 #include <range/v3/begin_end.hpp>
 #include <range/v3/range_traits.hpp>
 
@@ -18,10 +20,14 @@
 
 namespace phd {
 	inline namespace __abi_v0 {
-	namespace __detail {
-		template <typename __CodeUnit = char8_t, bool overlong_allowed = false, bool surrogates_allowed = false>
+	namespace __text_detail {
+		template <typename __Derived = void, typename __CodeUnit = char8_t, bool overlong_allowed = false, bool surrogates_allowed = false>
 		struct __utf8_with {
-			using state = __detail::__empty_state;
+		private:
+			using __self_t = typename std::conditional<std::is_void_v<__Derived>, __utf8_with, __Derived>::type;
+
+		public:
+			using state = __text_detail::__empty_state;
 			using code_unit = __CodeUnit;
 			using code_point = unicode_code_point;
 
@@ -45,64 +51,64 @@ namespace phd {
 
 				if (codepoint <= __unicode_detail::__last_1byte_value) {
 					if (__outit == __outlast) {
-						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
 					ranges::dereference(__outit) = static_cast<code_unit>(codepoint);
 					__outit = ranges::next(__outit);
 				}
 				else if (codepoint <= __unicode_detail::__last_2byte_value) {
 					if (__outit == __outlast) {
-						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
 					ranges::dereference(__outit) = static_cast<code_unit>(0xC0 | ((codepoint & 0x7C0) >> 6));
 					__outit = ranges::next(__outit);
 
 					if (__outit == __outlast) {
-						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
 					ranges::dereference(__outit) = static_cast<code_unit>(0x80 | (codepoint & 0x3F));
 					__outit = ranges::next(__outit);
 				}
 				else if (codepoint <= __unicode_detail::__last_3byte_value) {
 					if (__outit == __outlast) {
-						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
 					ranges::dereference(__outit) = static_cast<code_unit>(0xE0 | ((codepoint & 0xF000) >> 12));
 					__outit = ranges::next(__outit);
 
 					if (__outit == __outlast) {
-						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
 					ranges::dereference(__outit) = static_cast<code_unit>(0x80 | ((codepoint & 0xFC0) >> 6));
 					__outit = ranges::next(__outit);
 
 					if (__outit == __outlast) {
-						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
 					ranges::dereference(__outit) = static_cast<code_unit>(0x80 | (codepoint & 0x3F));
 					__outit = ranges::next(__outit);
 				}
 				else {
 					if (__outit == __outlast) {
-						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
 					ranges::dereference(__outit) = static_cast<code_unit>(0xF0 | ((codepoint & 0x1C0000) >> 18));
 					__outit = ranges::next(__outit);
 
 					if (__outit == __outlast) {
-						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
 					ranges::dereference(__outit) = static_cast<code_unit>(0xE0 | ((codepoint & 0xF000) >> 12));
 					__outit = ranges::next(__outit);
 
 					if (__outit == __outlast) {
-						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
 					ranges::dereference(__outit) = static_cast<code_unit>(0x80 | ((codepoint & 0xFC0) >> 6));
 					__outit = ranges::next(__outit);
 
 					if (__outit == __outlast) {
-						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
 					ranges::dereference(__outit) = static_cast<code_unit>(0x80 | (codepoint & 0x3F));
 					__outit = ranges::next(__outit);
@@ -134,7 +140,7 @@ namespace phd {
 				if (length == 1) {
 					__init = ranges::next(__init);
 					if (__outit == __outlast) {
-						return __error_handler(__utf8_with{}, __result_t(__InputRange(__init, __inlast), __OutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+						return __error_handler(__self_t{}, __result_t(__InputRange(__init, __inlast), __OutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
 					else {
 						ranges::dereference(__outit) = static_cast<code_point>(b0);
@@ -143,16 +149,16 @@ namespace phd {
 				}
 				const bool __is_invalid_cu = __unicode_detail::__is_invalid(static_cast<unsigned char>(b0));
 				if (__is_invalid_cu || __unicode_detail::__is_continuation(static_cast<unsigned char>(b0))) {
-					return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, __is_invalid_cu ? encoding_errc::invalid_sequence : encoding_errc::invalid_leading_sequence));
+					return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, __is_invalid_cu ? encoding_errc::invalid_sequence : encoding_errc::invalid_leading_sequence));
 				}
 
 				__init = ranges::next(__init);
-				std::array<unsigned char, 4> b;
+				std::array<unsigned char, 4> b{};
 				b[0] = b0;
 				for (std::size_t i = 1; i < length; ++i) {
 					b[i] = ranges::dereference(__init);
 					if (!__unicode_detail::__is_continuation(b[i])) {
-						return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_trailing_sequence));
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_trailing_sequence));
 					}
 					__init = ranges::next(__init);
 				}
@@ -171,14 +177,14 @@ namespace phd {
 				}
 
 				if (__unicode_detail::__is_overlong(__decoded, length)) {
-					return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::overlong_sequence));
+					return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::overlong_sequence));
 				}
 				if (__unicode_detail::__is_surrogate(__decoded) || __decoded > __unicode_detail::__last_code_point) {
-					return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_output));
+					return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_output));
 				}
 
 				if (__outit == __outlast) {
-					return __error_handler(__utf8_with{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 				}
 				// then everything is fine
 				ranges::dereference(__outit) = __decoded;
@@ -187,9 +193,9 @@ namespace phd {
 			}
 		};
 	}
-	} // namespace __abi_v0::__detail
+	} // namespace __abi_v0::__text_detail
 
-	struct utf8 : __detail::__utf8_with<char8_t> {};
+	struct utf8 : __text_detail::__utf8_with<utf8, char8_t> {};
 
 } // namespace phd
 

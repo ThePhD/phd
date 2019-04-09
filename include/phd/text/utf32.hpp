@@ -4,20 +4,124 @@
 #define PHD_TEXT_UTF32_HPP
 
 #include <phd/text/text_forward.hpp>
+#include <phd/text/empty_state.hpp>
+#include <phd/text/code_unit.hpp>
+#include <phd/text/code_point.hpp>
+#include <phd/text/error_handler.hpp>
+#include <phd/text/is_ignorable_error_handler.hpp>
+
+#include <range/v3/core.hpp>
+#include <range/v3/begin_end.hpp>
 
 namespace phd {
 	inline namespace __abi_v0 {
-	namespace __detail {
-		template <typename __CodeUnit = char32_t>
+	namespace __text_detail {
+		template <typename __Derived = void, typename __CodeUnit = char32_t, bool __validate = true>
 		struct __utf32_with {
-			using state = __detail::__empty_state;
+		private:
+			using __self_t = typename std::conditional<std::is_void_v<__Derived>, __utf32_with, __Derived>::type;
+
+		public:
+			using state = __text_detail::__empty_state;
 			using code_unit = __CodeUnit;
 			using code_point = unicode_code_point;
+
+			template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
+			static constexpr auto decode(__InputRange&& __input, __OutputRange&& __output, state& __s, __ErrorHandler&& __error_handler) {
+				using __uInputRange = typename meta::template remove_cv_ref<__InputRange>::type;
+				using __uOutputRange = typename meta::template remove_cv_ref<__OutputRange>::type;
+				using __uErrorHandler = typename meta::template remove_cv_ref<__ErrorHandler>::type;
+				using __result_t = encoding_result<__uInputRange, __uOutputRange, state>;
+
+				auto __init = ranges::cbegin(__input);
+				auto __inlast = ranges::cend(__input);
+				if constexpr (!is_ignorable_error_handler_v<__uErrorHandler>) {
+					if (__init == __inlast) {
+						// an exhausted sequence is fine
+						return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
+					}
+				}
+				else {
+					(void)__inlast;
+				}
+
+				auto __outit = ranges::cbegin(__output);
+				auto __outlast = ranges::cend(__output);
+
+				if constexpr (!is_ignorable_error_handler_v<__uErrorHandler>) {
+					if (__outit == __outlast) {
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+				}
+				else {
+					(void)__outlast;
+				}
+
+				code_point __codepoint = ranges::dereference(__init);
+				__init = ranges::next(__init);
+
+				if constexpr (__validate && !is_ignorable_error_handler_v<__uErrorHandler>) {
+					if (__codepoint > __unicode_detail::__last_code_point || __unicode_detail::__is_surrogate(__codepoint)) {
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_output));
+					}
+				}
+
+				ranges::dereference(__outit) = __codepoint;
+				__outit = ranges::next(__outit);
+
+				return __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::ok);
+			}
+
+			template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
+			static constexpr auto encode(__InputRange&& __input, __OutputRange&& __output, state& __s, __ErrorHandler&& __error_handler) {
+				using __uInputRange = typename meta::template remove_cv_ref<__InputRange>::type;
+				using __uOutputRange = typename meta::template remove_cv_ref<__OutputRange>::type;
+				using __uErrorHandler = typename meta::template remove_cv_ref<__ErrorHandler>::type;
+				using __result_t = encoding_result<__uInputRange, __uOutputRange, state>;
+
+				auto __init = ranges::cbegin(__input);
+				auto __inlast = ranges::cend(__input);
+				if constexpr (!is_ignorable_error_handler_v<__uErrorHandler>) {
+					if (__init == __inlast) {
+						// an exhausted sequence is fine
+						return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
+					}
+				}
+				else {
+					(void)__inlast;
+				}
+
+				auto __outit = ranges::cbegin(__output);
+				auto __outlast = ranges::cend(__output);
+
+				if constexpr (!is_ignorable_error_handler_v<__uErrorHandler>) {
+					if (__outit == __outlast) {
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
+					}
+				}
+				else {
+					(void)__outlast;
+				}
+
+				code_unit __unit = ranges::dereference(__init);
+				__init = ranges::next(__init);
+
+				if constexpr (__validate && !is_ignorable_error_handler_v<__uErrorHandler>) {
+					if (__unit > __unicode_detail::__last_code_point || __unicode_detail::__is_surrogate(__unit)) {
+						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_output));
+					}
+				}
+
+				ranges::dereference(__outit) = __unit;
+				__outit = ranges::next(__outit);
+
+				return __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::ok);
+			}
 		};
 	}
-	} // namespace __abi_v0::__detail
+	} // namespace __abi_v0::__text_detail
 
-	struct utf32 : __detail::__utf32_with<char32_t> {};
+	struct utf32 : __text_detail::__utf32_with<utf32, char32_t> {};
 
 } // namespace phd
 

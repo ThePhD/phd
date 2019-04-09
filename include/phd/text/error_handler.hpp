@@ -33,9 +33,8 @@ inline namespace __abi_v0 {
 		};
 	}; // namespace __text_detail
 
-
 	struct assume_valid_text_error_handler : __text_detail::__pass_through_text_error_handler {
-		using ignore_errors = std::true_type;
+		using assume_valid = std::true_type;
 	};
 
 	struct replacement_text_error_handler {
@@ -61,8 +60,8 @@ inline namespace __abi_v0 {
 			const basic_c_string_view<__input_code_point> __wut_range(__wut, 1);
 
 			__State __fresh_state{};
-			auto __encres = enc.encode(__wut_range, __result.output, __fresh_state, assume_valid_text_error_handler{});
-			__result.output = std::move(__encres.output);
+			auto __encresult = enc.encode(__wut_range, __result.output, __fresh_state, assume_valid_text_error_handler{});
+			__result.output = std::move(__encresult.output);
 
 			return __result;
 		}
