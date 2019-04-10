@@ -43,7 +43,7 @@ inline namespace __abi_v0 {
 	struct replacement_text_error_handler {
 		template <typename __Encoding, typename __InputRange, typename __OutputRange, typename __State>
 		constexpr auto operator()(const __Encoding& enc, encoding_result<__InputRange, __OutputRange, __State> __result) const {
-			auto __outit = ranges::begin(__result.output);
+			auto __outit   = ranges::begin(__result.output);
 			auto __outlast = ranges::end(__result.output);
 			if (__outit == __outlast) {
 				// BAIL
@@ -63,8 +63,8 @@ inline namespace __abi_v0 {
 			const basic_c_string_view<__input_code_point> __wut_range(__wut, 1);
 
 			__State __fresh_state{};
-			auto __encresult = enc.encode(__wut_range, std::move(__result.output), __fresh_state, assume_valid_text_error_handler{});
-			__result.output = std::move(__encresult.output);
+			auto __encresult    = enc.encode(__wut_range, std::move(__result.output), __fresh_state, assume_valid_text_error_handler{});
+			__result.output	= std::move(__encresult.output);
 			__result.error_code = encoding_errc::ok;
 
 			return __result;
@@ -75,7 +75,7 @@ inline namespace __abi_v0 {
 			using __output_code_point = encoding_code_point_t<__Encoding>;
 			//(void)enc; // UNUSED
 
-			auto __outit = ranges::begin(__result.output);
+			auto __outit   = ranges::begin(__result.output);
 			auto __outlast = ranges::end(__result.output);
 			if (__result.error_code == encoding_errc::insufficient_output_space || __outit == __outlast) {
 				// BAIL
@@ -94,7 +94,7 @@ inline namespace __abi_v0 {
 				}
 			}
 
-			__result.output = __OutputRange(__outit, __outlast);
+			__result.output	= __OutputRange(__outit, __outlast);
 			__result.error_code = encoding_errc::ok;
 
 			return __result;

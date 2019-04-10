@@ -6,17 +6,16 @@
 #include <range/v3/core.hpp>
 #include <range/v3/span.hpp>
 
-
 TEST_CASE("text/transcode/roundtrip", "transcode can roundtrip") {
 	constexpr const char32_t u32_unicode_truth[] = U"z♥䕦🍷";
 	constexpr const char16_t u16_unicode_truth[] = u"z♥䕦🍷";
-	constexpr const char8_t u8_unicode_truth[] = u8"z♥䕦🍷";
-	constexpr const wchar_t w_unicode_truth[] = L"z♥䕦🍷";
+	constexpr const char8_t u8_unicode_truth[]   = u8"z♥䕦🍷";
+	constexpr const wchar_t w_unicode_truth[]    = L"z♥䕦🍷";
 
 	constexpr const char32_t u32_ansi_truth[] = U"zá:iï";
 	constexpr const char16_t u16_ansi_truth[] = u"zá:iï";
-	constexpr const char8_t u8_ansi_truth[] = u8"zá:iï";
-	constexpr const wchar_t w_ansi_truth[] = L"zá:iï";
+	constexpr const char8_t u8_ansi_truth[]   = u8"zá:iï";
+	constexpr const wchar_t w_ansi_truth[]    = L"zá:iï";
 #ifdef _WIN32
 	constexpr const char ansi_truth[] = "z\xE1:i\xEF";
 #else
