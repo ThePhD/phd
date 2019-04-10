@@ -14,16 +14,22 @@
 
 namespace phd {
 
-	template <typename __In, typename __Out, typename __State>
+	template <typename __Input, typename __Output, typename __State>
 	struct encoding_result {
-		__In input;
-		__Out output;
+		__Input input;
+		__Output output;
 		__State& state;
 		encoding_errc error_code;
+		bool handled_error;
 
 		template <typename __InRange, typename __OutRange, typename __EncodingState>
 		constexpr encoding_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code = encoding_errc::ok)
-		: input(std::forward<__InRange>(__input)), output(std::forward<__OutRange>(__output)), state(std::forward<__EncodingState>(__state)), error_code(__error_code) {
+		: encoding_result(std::forward<__InRange>(__input), std::forward<__OutRange>(__output), std::forward<__EncodingState>(__state), __error_code, __error_code != encoding_errc::ok) {
+		}
+
+		template <typename __InRange, typename __OutRange, typename __EncodingState>
+		constexpr encoding_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code, bool __handled_error)
+		: input(std::forward<__InRange>(__input)), output(std::forward<__OutRange>(__output)), state(std::forward<__EncodingState>(__state)), error_code(__error_code), handled_error(__handled_error) {
 		}
 
 		// TODO: when the standard catches up
@@ -38,10 +44,16 @@ namespace phd {
 		__Output output;
 		__State& state;
 		encoding_errc error_code;
+		bool handled_error;
 
 		template <typename __InRange, typename __OutRange, typename __EncodingState>
 		constexpr decoding_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code = encoding_errc::ok)
-		: input(std::forward<__InRange>(__input)), output(std::forward<__OutRange>(__output)), state(std::forward<__EncodingState>(__state)), error_code(__error_code) {
+		: decoding_result(std::forward<__InRange>(__input), std::forward<__OutRange>(__output), std::forward<__EncodingState>(__state), __error_code, __error_code != encoding_errc::ok) {
+		}
+
+		template <typename __InRange, typename __OutRange, typename __EncodingState>
+		constexpr decoding_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code, bool __handled_error)
+		: input(std::forward<__InRange>(__input)), output(std::forward<__OutRange>(__output)), state(std::forward<__EncodingState>(__state)), error_code(__error_code), handled_error(__handled_error) {
 		}
 
 		// TODO: when the standard catches up

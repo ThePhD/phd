@@ -1,5 +1,5 @@
-#include <tests/classes.hpp>
-#include <tests/functions.hpp>
+#include <phd/tests/classes.hpp>
+#include <phd/tests/functions.hpp>
 
 my_convertible_class::operator i_to_i_f_ptr() const {
 	return i_to_i;

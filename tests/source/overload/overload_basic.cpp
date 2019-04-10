@@ -1,7 +1,7 @@
 #include <phd/overload/overload.hpp>
 
-#include <tests/classes.hpp>
-#include <tests/functions.hpp>
+#include <phd/tests/classes.hpp>
+#include <phd/tests/functions.hpp>
 
 #include <catch2/catch.hpp>
 

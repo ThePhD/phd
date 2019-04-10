@@ -51,8 +51,8 @@ namespace phd {
 				return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
 			}
 
-			auto __outit = ranges::cbegin(__output);
-			auto __outlast = ranges::cend(__output);
+			auto __outit = ranges::begin(__output);
+			auto __outlast = ranges::end(__output);
 
 			code_point codepoint = ranges::dereference(__init);
 			__init = ranges::next(__init);
@@ -68,7 +68,7 @@ namespace phd {
 			code_unit __intermediary_output[__state_count_max]{};
 			phd::windows::BOOL __used_default_char = false;
 			auto __wide_read_buffer = ranges::span(__wide_intermediary, __result.output.data());
-			int __res = phd::windows::WideCharToMultiByte(CP_ACP, 0, __wide_read_buffer.data(), static_cast<int>(__wide_read_buffer.size()), __intermediary_output, __state_count_max, &replacement_code_unit, std::addressof(__used_default_char));
+			int __res = phd::windows::WideCharToMultiByte(phd::windows::determine_code_page(), 0, __wide_read_buffer.data(), static_cast<int>(__wide_read_buffer.size()), __intermediary_output, __state_count_max, &replacement_code_unit, std::addressof(__used_default_char));
 			if (__res == 0) {
 				return __error_handler(execution{}, __result_t(std::move(__result.input), std::forward<__OutputRange>(__output), __s, phd::windows::GetLastError() == ERROR_INSUFFICIENT_BUFFER ? encoding_errc::insufficient_output_space : encoding_errc::invalid_sequence));
 			}
@@ -115,8 +115,8 @@ namespace phd {
 				return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
 			}
 
-			auto __outit = ranges::cbegin(__output);
-			auto __outlast = ranges::cend(__output);
+			auto __outit = ranges::begin(__output);
+			auto __outlast = ranges::end(__output);
 
 			if (__outit == __outlast) {
 				return __error_handler(execution{}, __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::insufficient_output_space));
@@ -124,6 +124,7 @@ namespace phd {
 
 			constexpr const std::size_t __state_count_max = 12;
 			code_unit __intermediary_input[__state_count_max] = { ranges::dereference(__init), {} };
+			__init = ranges::next(__init);
 			std::size_t __state_count = 1;
 			std::size_t __state_offset = 0;
 			for (; __state_count < __state_count_max; ++__state_count) {
@@ -131,17 +132,17 @@ namespace phd {
 #ifdef _WIN32
 				constexpr const int __wide_intermediary_size = 4;
 				wchar_t __wide_intermediary[__wide_intermediary_size]{};
-				int __res = phd::windows::MultiByteToWideChar(CP_ACP, 0,
+				int __res = phd::windows::MultiByteToWideChar(phd::windows::determine_code_page(), 0,
 					__intermediary_input, static_cast<int>(__state_count),
 					__wide_intermediary, __wide_intermediary_size);
 				if (__res == 0) {
 					if (phd::windows::GetLastError() == ERROR_NO_UNICODE_TRANSLATION) {
 						// loopback; we might just not have enough code units
-						__init = ranges::next(__init);
 						if (__init == __inlast) {
 							return __error_handler(execution{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::incomplete_sequence));
 						}
 						__intermediary_input[__state_count] = ranges::dereference(__init);
+						__init = ranges::next(__init);
 						continue;
 					}
 					return __error_handler(execution{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_sequence));

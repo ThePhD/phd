@@ -9,7 +9,7 @@ namespace phd {
 
 	inline namespace __abi_v0 {
 	namespace __text_detail {
-		template <typename, typename, bool, bool>
+		template <typename, typename, bool, bool, bool>
 		struct __utf8_with;
 
 		template <typename, typename, bool>

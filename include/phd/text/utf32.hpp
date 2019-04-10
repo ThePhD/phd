@@ -32,23 +32,19 @@ namespace phd {
 				using __uOutputRange = typename meta::template remove_cv_ref<__OutputRange>::type;
 				using __uErrorHandler = typename meta::template remove_cv_ref<__ErrorHandler>::type;
 				using __result_t = encoding_result<__uInputRange, __uOutputRange, state>;
+				constexpr bool __call_error_handler = !is_ignorable_error_handler_v<__uErrorHandler>;
 
 				auto __init = ranges::cbegin(__input);
 				auto __inlast = ranges::cend(__input);
-				if constexpr (!is_ignorable_error_handler_v<__uErrorHandler>) {
-					if (__init == __inlast) {
-						// an exhausted sequence is fine
-						return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
-					}
-				}
-				else {
-					(void)__inlast;
+				if (__init == __inlast) {
+					// an exhausted sequence is fine
+					return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
 				}
 
-				auto __outit = ranges::cbegin(__output);
-				auto __outlast = ranges::cend(__output);
+				auto __outit = ranges::begin(__output);
+				auto __outlast = ranges::end(__output);
 
-				if constexpr (!is_ignorable_error_handler_v<__uErrorHandler>) {
+				if constexpr (__call_error_handler) {
 					if (__outit == __outlast) {
 						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
@@ -60,7 +56,7 @@ namespace phd {
 				code_point __codepoint = ranges::dereference(__init);
 				__init = ranges::next(__init);
 
-				if constexpr (__validate && !is_ignorable_error_handler_v<__uErrorHandler>) {
+				if constexpr (__validate && __call_error_handler) {
 					if (__codepoint > __unicode_detail::__last_code_point || __unicode_detail::__is_surrogate(__codepoint)) {
 						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_output));
 					}
@@ -78,23 +74,19 @@ namespace phd {
 				using __uOutputRange = typename meta::template remove_cv_ref<__OutputRange>::type;
 				using __uErrorHandler = typename meta::template remove_cv_ref<__ErrorHandler>::type;
 				using __result_t = encoding_result<__uInputRange, __uOutputRange, state>;
+				constexpr bool __call_error_handler = !is_ignorable_error_handler_v<__uErrorHandler>;
 
 				auto __init = ranges::cbegin(__input);
 				auto __inlast = ranges::cend(__input);
-				if constexpr (!is_ignorable_error_handler_v<__uErrorHandler>) {
-					if (__init == __inlast) {
-						// an exhausted sequence is fine
-						return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
-					}
-				}
-				else {
-					(void)__inlast;
+				if (__init == __inlast) {
+					// an exhausted sequence is fine
+					return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
 				}
 
-				auto __outit = ranges::cbegin(__output);
-				auto __outlast = ranges::cend(__output);
+				auto __outit = ranges::begin(__output);
+				auto __outlast = ranges::end(__output);
 
-				if constexpr (!is_ignorable_error_handler_v<__uErrorHandler>) {
+				if constexpr (__call_error_handler) {
 					if (__outit == __outlast) {
 						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::insufficient_output_space));
 					}
@@ -106,7 +98,7 @@ namespace phd {
 				code_unit __unit = ranges::dereference(__init);
 				__init = ranges::next(__init);
 
-				if constexpr (__validate && !is_ignorable_error_handler_v<__uErrorHandler>) {
+				if constexpr (__validate && __call_error_handler) {
 					if (__unit > __unicode_detail::__last_code_point || __unicode_detail::__is_surrogate(__unit)) {
 						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_output));
 					}

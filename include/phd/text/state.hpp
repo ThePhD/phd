@@ -7,7 +7,7 @@ namespace phd {
 
 	template <typename T>
 	struct encoding_state {
-		using type = typename T::code_unit;
+		using type = typename T::state;
 	};
 
 	template <typename T>

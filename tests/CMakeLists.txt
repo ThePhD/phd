@@ -7,6 +7,10 @@ set(phd_test_sources
 	"source/overload/overload_basic.cpp"
 	"source/overload/overload_basic_variant.cpp"
 
+	"source/text/decode.cpp"
+	"source/text/encode.cpp"
+	"source/text/transcode.cpp"
+	"source/text/errors.cpp"
 	"source/text/encoding.cpp"
 	"source/text/text.cpp"
 	"source/text/text_view.cpp"

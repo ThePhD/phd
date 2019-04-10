@@ -14,7 +14,7 @@ FixNamespaceComments: true
 ColumnLimit: 0
 AlignAfterOpenBracket: DontAlign # uses ContinuationIndentWidth for this instead
 AccessModifierOffset: -5 # do not push public: or private: around
-#AlignConsecutiveAssignments: true # affects more than what's expected: do not use
+AlignConsecutiveAssignments: true # affects more than what's expected: do not use
 #AlignConsecutiveDeclarations: true # affects more than what's expected: do not use
 
 # Type Alignment

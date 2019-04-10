@@ -2,132 +2,173 @@
 
 #include <catch2/catch.hpp>
 
+#include <range/v3/core.hpp>
 #include <range/v3/span.hpp>
 
-#include <iostream>
+#include <phd/tests/basic_unicode_strings.hpp>
 
 TEST_CASE("text/encoding/core", "basic usages of encoding do not explode") {
 	constexpr const std::size_t encode_output_max = 16;
 	constexpr const std::size_t decode_output_max = 2;
-	constexpr const char32_t u32_unicode_truth[] = U"♥";
-	constexpr const char16_t u16_unicode_truth[] = u"♥";
-	constexpr const char8_t u8_unicode_truth[] = u8"♥";
-	constexpr const wchar_t w_unicode_truth[] = L"♥";
-	constexpr const char unicode_truth[] = "\u2665";
-
-	constexpr const char32_t u32_ansi_truth[] = U"á";
-	constexpr const char16_t u16_ansi_truth[] = u"á";
-	constexpr const char8_t u8_ansi_truth[] = u8"á";
-	constexpr const wchar_t w_ansi_truth[] = L"á";
-	constexpr const char ansi_truth[] = "á";
 
 	SECTION("decode") {
 		SECTION("char") {
 			phd::execution enc;
 
-			const auto& input = ansi_truth;
-			phd::unicode_code_point output[decode_output_max]{};
+			phd::unicode_code_point output0[decode_output_max]{};
 			phd::execution::state s{};
-			auto dres = enc.decode(phd::c_string_view(input), ranges::span(output, 1), s, phd::default_text_error_handler{});
-			REQUIRE(dres.error_code == phd::encoding_errc::ok);
-			REQUIRE_FALSE(dres.error());
-			REQUIRE(phd::u32c_string_view(output) == u32_ansi_truth);
+			auto result0 = enc.decode(phd::c_string_view(phd::tests::ansi_single_truth), ranges::span(output0, 1), s, phd::default_text_error_handler{});
+			REQUIRE(result0.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result0.error());
+			REQUIRE(phd::u32c_string_view(output0) == phd::tests::u32_ansi_single_truth);
 		}
 		SECTION("wchar_t") {
 			phd::wide_execution enc;
 
-			const auto& input = w_ansi_truth;
-			phd::unicode_code_point output[decode_output_max]{};
-			phd::wide_execution::state s{};
-			auto dres = enc.decode(phd::wc_string_view(input), ranges::span(output, 1), s, phd::default_text_error_handler{});
-			REQUIRE(dres.error_code == phd::encoding_errc::ok);
-			REQUIRE_FALSE(dres.error());
-			REQUIRE(phd::u32c_string_view(output) == u32_ansi_truth);
+			phd::unicode_code_point output0[decode_output_max]{};
+			phd::wide_execution::state s0{};
+			auto result0 = enc.decode(phd::wc_string_view(phd::tests::w_ansi_single_truth), ranges::span(output0, 1), s0, phd::default_text_error_handler{});
+			REQUIRE(result0.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result0.error());
+			REQUIRE(phd::u32c_string_view(output0) == phd::tests::u32_ansi_single_truth);
+
+			phd::unicode_code_point output1[decode_output_max]{};
+			phd::wide_execution::state s1{};
+			auto result1 = enc.decode(phd::wc_string_view(phd::tests::w_unicode_single_truth), ranges::span(output1, 1), s1, phd::default_text_error_handler{});
+			REQUIRE(result1.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result1.error());
+			REQUIRE(phd::u32c_string_view(output1) == phd::tests::u32_unicode_single_truth);
 		}
 		SECTION("char8_t") {
 			phd::utf8 enc;
 
-			const auto& input = u8_unicode_truth;
-			phd::unicode_code_point output[decode_output_max]{};
-			phd::utf8::state s{};
-			auto dres = enc.decode(phd::u8c_string_view(input), ranges::span(output, 1), s, phd::default_text_error_handler{});
-			REQUIRE(dres.error_code == phd::encoding_errc::ok);
-			REQUIRE_FALSE(dres.error());
-			REQUIRE(phd::u32c_string_view(output) == u32_unicode_truth);
+			phd::unicode_code_point output0[decode_output_max]{};
+			phd::utf8::state s0{};
+			auto result0 = enc.decode(phd::u8c_string_view(phd::tests::u8_ansi_single_truth), ranges::span(output0, 1), s0, phd::default_text_error_handler{});
+			REQUIRE(result0.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result0.error());
+			REQUIRE(phd::u32c_string_view(output0) == phd::tests::u32_ansi_single_truth);
+
+			phd::unicode_code_point output1[decode_output_max]{};
+			phd::utf8::state s1{};
+			auto result1 = enc.decode(phd::u8c_string_view(phd::tests::u8_unicode_single_truth), ranges::span(output1, 1), s1, phd::default_text_error_handler{});
+			REQUIRE(result1.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result1.error());
+			REQUIRE(phd::u32c_string_view(output1) == phd::tests::u32_unicode_single_truth);
 		}
 		SECTION("char16_t") {
 			phd::utf16 enc;
 
-			const auto& input = u16_unicode_truth;
-			phd::unicode_code_point output[decode_output_max]{};
-			phd::utf16::state s{};
-			auto dres = enc.decode(phd::u16c_string_view(input), ranges::span(output, 1), s, phd::default_text_error_handler{});
-			REQUIRE(dres.error_code == phd::encoding_errc::ok);
-			REQUIRE_FALSE(dres.error());
-			REQUIRE(phd::u32c_string_view(output) == u32_unicode_truth);
+			phd::unicode_code_point output0[decode_output_max]{};
+			phd::utf16::state s0{};
+			auto result0 = enc.decode(phd::u16c_string_view(phd::tests::u16_ansi_single_truth), ranges::span(output0, 1), s0, phd::default_text_error_handler{});
+			REQUIRE(result0.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result0.error());
+			REQUIRE(phd::u32c_string_view(output0) == phd::tests::u32_ansi_single_truth);
+
+			phd::unicode_code_point output1[decode_output_max]{};
+			phd::utf16::state s1{};
+			auto result1 = enc.decode(phd::u16c_string_view(phd::tests::u16_unicode_single_truth), ranges::span(output1, 1), s1, phd::default_text_error_handler{});
+			REQUIRE(result1.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result1.error());
+			REQUIRE(phd::u32c_string_view(output1) == phd::tests::u32_unicode_single_truth);
 		}
 		SECTION("char32_t") {
 			phd::utf32 enc;
 
-			const auto& input = u32_unicode_truth;
-			phd::unicode_code_point output[decode_output_max]{};
-			phd::utf32::state s{};
-			auto dres = enc.decode(phd::u32c_string_view(input), ranges::span(output, 1), s, phd::default_text_error_handler{});
-			REQUIRE(dres.error_code == phd::encoding_errc::ok);
-			REQUIRE_FALSE(dres.error());
-			REQUIRE(phd::u32c_string_view(output) == u32_unicode_truth);
+			phd::unicode_code_point output0[decode_output_max]{};
+			phd::utf32::state s0{};
+			auto result0 = enc.decode(phd::u32c_string_view(phd::tests::u32_unicode_single_truth), ranges::span(output0, 1), s0, phd::default_text_error_handler{});
+			REQUIRE(result0.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result0.error());
+			REQUIRE(phd::u32c_string_view(output0) == phd::tests::u32_unicode_single_truth);
+
+			phd::unicode_code_point output1[decode_output_max]{};
+			phd::utf32::state s1{};
+			auto result1 = enc.decode(phd::u32c_string_view(phd::tests::u32_unicode_single_truth), ranges::span(output1, 1), s1, phd::default_text_error_handler{});
+			REQUIRE(result1.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result1.error());
+			REQUIRE(phd::u32c_string_view(output0) == phd::tests::u32_unicode_single_truth);
 		}
 	}
 	SECTION("encode") {
 		SECTION("char") {
 			phd::execution enc;
 
-			char output[encode_output_max]{};
-			phd::execution::state s{};
-			auto dres = enc.encode(phd::u32c_string_view(u32_ansi_truth), ranges::span(output, 7), s, phd::default_text_error_handler{});
-			REQUIRE(dres.error_code == phd::encoding_errc::ok);
-			REQUIRE_FALSE(dres.error());
-			REQUIRE(phd::c_string_view(output) == ansi_truth);
+			char output0[encode_output_max]{};
+			phd::execution::state s0{};
+			auto result0 = enc.encode(phd::u32c_string_view(phd::tests::u32_ansi_single_truth), ranges::span(output0, 7), s0, phd::default_text_error_handler{});
+			REQUIRE(result0.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result0.error());
+			REQUIRE(phd::c_string_view(output0) == phd::tests::ansi_single_truth);
 		}
 		SECTION("wchar_t") {
 			phd::wide_execution enc;
 
-			wchar_t output[encode_output_max]{};
-			phd::wide_execution::state s{};
-			auto dres = enc.encode(phd::u32c_string_view(u32_ansi_truth), ranges::span(output, 7), s, phd::default_text_error_handler{});
-			REQUIRE(dres.error_code == phd::encoding_errc::ok);
-			REQUIRE_FALSE(dres.error());
-			REQUIRE(phd::wc_string_view(output) == w_ansi_truth);
+			wchar_t output0[encode_output_max]{};
+			phd::wide_execution::state s0{};
+			auto result0 = enc.encode(phd::u32c_string_view(phd::tests::u32_ansi_single_truth), ranges::span(output0, 7), s0, phd::default_text_error_handler{});
+			REQUIRE(result0.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result0.error());
+			REQUIRE(phd::wc_string_view(output0) == phd::tests::w_ansi_single_truth);
+
+			wchar_t output1[encode_output_max]{};
+			phd::wide_execution::state s1{};
+			auto result1 = enc.encode(phd::u32c_string_view(phd::tests::u32_unicode_single_truth), ranges::span(output0, 7), s1, phd::default_text_error_handler{});
+			REQUIRE(result1.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result1.error());
+			REQUIRE(phd::wc_string_view(output0) == phd::tests::w_unicode_single_truth);
 		}
 		SECTION("char8_t") {
 			phd::utf8 enc;
 
-			char8_t output[encode_output_max]{};
-			phd::utf8::state s{};
-			auto dres = enc.encode(phd::u32c_string_view(u32_unicode_truth), ranges::span(output, 3), s, phd::default_text_error_handler{});
-			REQUIRE(dres.error_code == phd::encoding_errc::ok);
-			REQUIRE_FALSE(dres.error());
-			REQUIRE(phd::u8c_string_view(output) == u8_unicode_truth);
+			char8_t output0[encode_output_max]{};
+			phd::utf8::state s0{};
+			auto result0 = enc.encode(phd::u32c_string_view(phd::tests::u32_ansi_single_truth), ranges::span(output0, encode_output_max), s0, phd::default_text_error_handler{});
+			REQUIRE(result0.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result0.error());
+			REQUIRE(phd::u8c_string_view(output0) == phd::tests::u8_ansi_single_truth);
+
+			char8_t output1[encode_output_max]{};
+			phd::utf8::state s1{};
+			auto result1 = enc.encode(phd::u32c_string_view(phd::tests::u32_unicode_single_truth), ranges::span(output1, encode_output_max), s1, phd::default_text_error_handler{});
+			REQUIRE(result1.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result1.error());
+			REQUIRE(phd::u8c_string_view(output1) == phd::tests::u8_unicode_single_truth);
 		}
 		SECTION("char16_t") {
 			phd::utf16 enc;
 
-			char16_t output[encode_output_max]{};
-			phd::utf16::state s{};
-			auto dres = enc.encode(phd::u32c_string_view(u32_unicode_truth), ranges::span(output, 3), s, phd::default_text_error_handler{});
-			REQUIRE(dres.error_code == phd::encoding_errc::ok);
-			REQUIRE_FALSE(dres.error());
-			REQUIRE(phd::u16c_string_view(output) == u16_unicode_truth);
+			char16_t output0[encode_output_max]{};
+			phd::utf16::state s0{};
+			auto result0 = enc.encode(phd::u32c_string_view(phd::tests::u32_unicode_single_truth), ranges::span(output0, encode_output_max), s0, phd::default_text_error_handler{});
+			REQUIRE(result0.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result0.error());
+			REQUIRE(phd::u16c_string_view(output0) == phd::tests::u16_unicode_single_truth);
+
+			char16_t output1[encode_output_max]{};
+			phd::utf16::state s1{};
+			auto result1 = enc.encode(phd::u32c_string_view(phd::tests::u32_unicode_single_truth), ranges::span(output1, encode_output_max), s1, phd::default_text_error_handler{});
+			REQUIRE(result1.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result1.error());
+			REQUIRE(phd::u16c_string_view(output1) == phd::tests::u16_unicode_single_truth);
 		}
 		SECTION("char32_t") {
 			phd::utf32 enc;
 
-			char32_t output[encode_output_max]{};
-			phd::utf32::state s{};
-			auto dres = enc.encode(phd::u32c_string_view(u32_unicode_truth), ranges::span(output, 3), s, phd::default_text_error_handler{});
-			REQUIRE(dres.error_code == phd::encoding_errc::ok);
-			REQUIRE_FALSE(dres.error());
-			REQUIRE(phd::u32c_string_view(output) == u32_unicode_truth);
+			char32_t output0[encode_output_max]{};
+			phd::utf32::state s0{};
+			auto result0 = enc.encode(phd::u32c_string_view(phd::tests::u32_unicode_single_truth), ranges::span(output0, encode_output_max), s0, phd::default_text_error_handler{});
+			REQUIRE(result0.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result0.error());
+			REQUIRE(phd::u32c_string_view(output0) == phd::tests::u32_unicode_single_truth);
+
+			char32_t output1[encode_output_max]{};
+			phd::utf32::state s1{};
+			auto result1 = enc.encode(phd::u32c_string_view(phd::tests::u32_unicode_single_truth), ranges::span(output1, encode_output_max), s1, phd::default_text_error_handler{});
+			REQUIRE(result1.error_code == phd::encoding_errc::ok);
+			REQUIRE_FALSE(result1.error());
+			REQUIRE(phd::u32c_string_view(output1) == phd::tests::u32_unicode_single_truth);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-#include <tests/functions.hpp>
+#include <phd/tests/functions.hpp>
 
 int f(int) {
 	return 0;

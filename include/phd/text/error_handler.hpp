@@ -25,24 +25,27 @@ namespace phd {
 inline namespace __abi_v0 {
 
 	namespace __text_detail {
-		struct __pass_through_text_error_handler {
+		template <bool __assume_validity = false>
+		struct __pass_through_text_error_handler_with {
+			using assume_valid = std::integral_constant<bool, __assume_validity>;
+
 			template <typename __Encoding, typename Result>
 			constexpr auto operator()(const __Encoding&, Result __result) const {
 				return __result;
 			}
 		};
+
+		using __pass_through_text_error_handler = __pass_through_text_error_handler_with<false>;
 	}; // namespace __text_detail
 
-	struct assume_valid_text_error_handler : __text_detail::__pass_through_text_error_handler {
-		using assume_valid = std::true_type;
-	};
+	struct assume_valid_text_error_handler : __text_detail::__pass_through_text_error_handler_with<true> {};
 
 	struct replacement_text_error_handler {
 		template <typename __Encoding, typename __InputRange, typename __OutputRange, typename __State>
 		constexpr auto operator()(const __Encoding& enc, encoding_result<__InputRange, __OutputRange, __State> __result) const {
 			auto __outit = ranges::begin(__result.output);
-			auto __outsentinel = ranges::end(__result.output);
-			if (__outit == __outsentinel) {
+			auto __outlast = ranges::end(__result.output);
+			if (__outit == __outlast) {
 				// BAIL
 				return __result;
 			}
@@ -60,8 +63,9 @@ inline namespace __abi_v0 {
 			const basic_c_string_view<__input_code_point> __wut_range(__wut, 1);
 
 			__State __fresh_state{};
-			auto __encresult = enc.encode(__wut_range, __result.output, __fresh_state, assume_valid_text_error_handler{});
+			auto __encresult = enc.encode(__wut_range, std::move(__result.output), __fresh_state, assume_valid_text_error_handler{});
 			__result.output = std::move(__encresult.output);
+			__result.error_code = encoding_errc::ok;
 
 			return __result;
 		}
@@ -72,13 +76,13 @@ inline namespace __abi_v0 {
 			//(void)enc; // UNUSED
 
 			auto __outit = ranges::begin(__result.output);
-			auto __outsentinel = ranges::end(__result.output);
-			if (__result.error_code == encoding_errc::insufficient_output_space || __outit == __outsentinel) {
+			auto __outlast = ranges::end(__result.output);
+			if (__result.error_code == encoding_errc::insufficient_output_space || __outit == __outlast) {
 				// BAIL
 				return __result;
 			}
 
-			if constexpr (is_code_point_replaceable_v<__output_code_point>) {
+			if constexpr (is_code_point_replaceable_v<__Encoding>) {
 				(*__outit) = __Encoding::replacement_code_point;
 			}
 			else {
@@ -90,7 +94,8 @@ inline namespace __abi_v0 {
 				}
 			}
 
-			__result.output = __OutputRange(__outit, __outsentinel);
+			__result.output = __OutputRange(__outit, __outlast);
+			__result.error_code = encoding_errc::ok;
 
 			return __result;
 		}

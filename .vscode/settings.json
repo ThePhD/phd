@@ -82,7 +82,8 @@
 		"stack": "cpp",
 		"unordered_set": "cpp",
 		"cuchar": "cpp",
-		"clocale": "cpp"
+		"clocale": "cpp",
+		"*.tcc": "cpp"
 	},
 	"cmake.autoRestartBuild": true,
 	"cmake.saveBeforeBuild": true,
