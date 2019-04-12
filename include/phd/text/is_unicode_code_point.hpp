@@ -9,11 +9,11 @@
 
 namespace phd {
 
-	template <typename T>
-	struct is_unicode_code_point : std::integral_constant<bool, std::is_same_v<T, unicode_code_point> || std::is_same_v<T, unicode_scalar_value>> {};
+	template <typename __T>
+	struct is_unicode_code_point : std::integral_constant<bool, std::is_same_v<__T, unicode_code_point> || std::is_same_v<__T, unicode_scalar_value>> {};
 
-	template <typename T>
-	constexpr inline bool is_unicode_code_point_v = is_unicode_code_point<T>::value;
+	template <typename __T>
+	constexpr inline bool is_unicode_code_point_v = is_unicode_code_point<__T>::value;
 
 } // namespace phd
 

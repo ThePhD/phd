@@ -6,7 +6,7 @@
 #include <phd/text/char8_t.hpp>
 #include <phd/text/unicode_code_point.hpp>
 #include <phd/text/detail/unicode_detail.hpp>
-#include <phd/text/encoding_result.hpp>
+#include <phd/text/encode_result.hpp>
 #include <phd/text/empty_state.hpp>
 #include <phd/text/is_ignorable_error_handler.hpp>
 
@@ -28,19 +28,21 @@ namespace phd {
 			using __self_t = typename std::conditional<std::is_void_v<__Derived>, __utf8_with, __Derived>::type;
 
 		public:
-			using state = __text_detail::__empty_state;
-			using code_unit = __CodeUnit;
-			using code_point = unicode_code_point;
+			using state			 = __text_detail::__empty_state;
+			using code_unit		 = __CodeUnit;
+			using code_point		 = unicode_code_point;
+			using is_decode_injective = std::true_type;
+			using is_encode_injective = std::true_type;
 
 			template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
 			static constexpr auto encode(__InputRange&& __input, __OutputRange&& __output, state& __s, __ErrorHandler&& __error_handler) {
-				using __uInputRange = meta::remove_cv_ref_t<__InputRange>;
-				using __uOutputRange = meta::remove_cv_ref_t<__OutputRange>;
-				using __uErrorHandler = meta::remove_cv_ref_t<__ErrorHandler>;
-				using __result_t = encoding_result<__uInputRange, __uOutputRange, state>;
+				using __uInputRange				 = meta::remove_cv_ref_t<__InputRange>;
+				using __uOutputRange			 = meta::remove_cv_ref_t<__OutputRange>;
+				using __uErrorHandler			 = meta::remove_cv_ref_t<__ErrorHandler>;
+				using __result_t				 = encode_result<__uInputRange, __uOutputRange, state>;
 				constexpr bool __call_error_handler = !is_ignorable_error_handler_v<__uErrorHandler>;
 
-				auto __init = ranges::cbegin(__input);
+				auto __init   = ranges::cbegin(__input);
 				auto __inlast = ranges::cend(__input);
 
 				if (__init == __inlast) {
@@ -48,11 +50,11 @@ namespace phd {
 					return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
 				}
 
-				auto __outit = ranges::begin(__output);
+				auto __outit   = ranges::begin(__output);
 				auto __outlast = ranges::end(__output);
 
 				code_point __codepoint = ranges::dereference(__init);
-				__init = ranges::next(__init);
+				__init			   = ranges::next(__init);
 
 				if constexpr (__call_error_handler) {
 					if (__codepoint > __unicode_detail::__last_code_point) {
@@ -79,7 +81,7 @@ namespace phd {
 								}
 							}
 							ranges::dereference(__outit) = static_cast<code_unit>(payload[i]);
-							__outit = ranges::next(__outit);
+							__outit				    = ranges::next(__outit);
 						}
 					}
 				}
@@ -99,15 +101,15 @@ namespace phd {
 					{ 0b00000001, __unicode_detail::__start_6byte_continuation },
 				};
 
-				int __length = __unicode_detail::__decode_length<__overlong_allowed>(__codepoint);
-				int __lengthindex = __length - 1;
+				int __length					   = __unicode_detail::__decode_length<__overlong_allowed>(__codepoint);
+				int __lengthindex				   = __length - 1;
 				const auto& __first_mask_continuation = __first_mask_continuation_values[__lengthindex];
-				const char8_t& __first_mask = __first_mask_continuation[0];
-				const char8_t& __first_continuation = __first_mask_continuation[1];
-				int __current_shift = 6 * __lengthindex;
+				const char8_t& __first_mask		   = __first_mask_continuation[0];
+				const char8_t& __first_continuation   = __first_mask_continuation[1];
+				int __current_shift				   = 6 * __lengthindex;
 
 				ranges::dereference(__outit) = static_cast<code_unit>(__first_continuation | static_cast<char8_t>((__codepoint >> __current_shift) & __first_mask));
-				__outit = ranges::next(__outit);
+				__outit				    = ranges::next(__outit);
 
 				if (__lengthindex > 0) {
 					__current_shift -= 6;
@@ -119,7 +121,7 @@ namespace phd {
 						}
 
 						ranges::dereference(__outit) = static_cast<code_unit>(__unicode_detail::__continuation_signature | static_cast<char8_t>((__codepoint >> __current_shift) & __unicode_detail::__continuation_mask_value));
-						__outit = ranges::next(__outit);
+						__outit				    = ranges::next(__outit);
 					}
 				}
 
@@ -128,13 +130,13 @@ namespace phd {
 
 			template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
 			static constexpr auto decode(__InputRange&& __input, __OutputRange&& __output, state& __s, __ErrorHandler&& __error_handler) {
-				using __uInputRange = typename meta::remove_cv_ref<__InputRange>::type;
-				using __uOutputRange = typename meta::remove_cv_ref<__OutputRange>::type;
-				using __uErrorHandler = typename meta::remove_cv_ref<__ErrorHandler>::type;
-				using __result_t = decoding_result<__uInputRange, __uOutputRange, state>;
+				using __uInputRange				 = typename meta::remove_cv_ref<__InputRange>::type;
+				using __uOutputRange			 = typename meta::remove_cv_ref<__OutputRange>::type;
+				using __uErrorHandler			 = typename meta::remove_cv_ref<__ErrorHandler>::type;
+				using __result_t				 = decode_result<__uInputRange, __uOutputRange, state>;
 				constexpr bool __call_error_handler = !is_ignorable_error_handler_v<__uErrorHandler>;
 
-				auto __init = ranges::cbegin(__input);
+				auto __init   = ranges::cbegin(__input);
 				auto __inlast = ranges::cend(__input);
 
 				if (__init == __inlast) {
@@ -142,7 +144,7 @@ namespace phd {
 					return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
 				}
 
-				auto __outit = ranges::begin(__output);
+				auto __outit   = ranges::begin(__output);
 				auto __outlast = ranges::end(__output);
 				if constexpr (__call_error_handler) {
 					if (__outit == __outlast) {
@@ -153,8 +155,8 @@ namespace phd {
 					(void)__outlast;
 				}
 
-				code_unit __b0 = ranges::dereference(__init);
-				__init = ranges::next(__init);
+				code_unit __b0	= ranges::dereference(__init);
+				__init		    = ranges::next(__init);
 				std::size_t length = __unicode_detail::__sequence_length(static_cast<char8_t>(__b0));
 
 				if constexpr (!__overlong_allowed) {
@@ -167,7 +169,7 @@ namespace phd {
 
 				if (length == 1) {
 					ranges::dereference(__outit) = static_cast<code_point>(__b0);
-					__outit = ranges::next(__outit);
+					__outit				    = ranges::next(__outit);
 					return __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s);
 				}
 
@@ -186,7 +188,7 @@ namespace phd {
 							return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::incomplete_sequence));
 						}
 					}
-					b[i] = ranges::dereference(__init);
+					b[i]   = ranges::dereference(__init);
 					__init = ranges::next(__init);
 					if (!__unicode_detail::__is_continuation(b[i])) {
 						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_trailing_sequence));
@@ -224,7 +226,7 @@ namespace phd {
 				}
 				// then everything is fine
 				ranges::dereference(__outit) = __decoded;
-				__outit = ranges::next(__outit);
+				__outit				    = ranges::next(__outit);
 				return __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s);
 			}
 		};

@@ -8,26 +8,26 @@
 
 namespace phd {
 
-	template <typename Encoding, typename NormalizationForm = nfkc, typename Iterable = basic_c_string_view<encoding_code_unit_t<Encoding>>>
+	template <typename __Encoding, typename __NormalizationForm = nfkc, typename __Iterable = basic_c_string_view<encoding_code_unit_t<__Encoding>>>
 	class basic_text_view {
 	public:
-		using encoding_type = Encoding;
-		using iterable_type = Iterable;
+		using encoding_type = __Encoding;
+		using iterable_type = __Iterable;
 
 	private:
-		iterable_type mstorage;
+		iterable_type __mstorage;
 
 	public:
 		iterable_type&& storage() && {
-			return std::move(mstorage);
+			return std::move(__mstorage);
 		}
 
 		const iterable_type& storage() const& {
-			return mstorage;
+			return __mstorage;
 		}
 
 		iterable_type& storage() & {
-			return mstorage;
+			return __mstorage;
 		}
 	};
 

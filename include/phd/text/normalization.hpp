@@ -5,6 +5,13 @@
 
 namespace phd {
 
+	namespace __abi_v0 {
+		template <bool __is_compatibility>
+		struct __nfc;
+		template <bool __is_compatibility>
+		struct __nfkd;
+	} // namespace __abi_v0
+
 	struct nfc;
 	struct nfd;
 	struct nfkc;

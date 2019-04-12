@@ -7,13 +7,13 @@
 
 namespace phd {
 
-	template <typename T>
+	template <typename __T>
 	struct encoding_code_point {
-		using type = typename T::code_point;
+		using type = typename __T::code_point;
 	};
 
-	template <typename T>
-	using encoding_code_point_t = typename encoding_code_point<T>::type;
+	template <typename __T>
+	using encoding_code_point_t = typename encoding_code_point<__T>::type;
 
 } // namespace phd
 

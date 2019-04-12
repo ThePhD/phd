@@ -5,7 +5,8 @@
 
 namespace phd {
 
-	using unicode_code_point = char32_t;
+	// TODO: implement
+	using unicode_scalar_value = char32_t;
 
 } // namespace phd
 

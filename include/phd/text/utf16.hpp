@@ -8,6 +8,7 @@
 #include <phd/text/code_unit.hpp>
 #include <phd/text/code_point.hpp>
 #include <phd/text/error_handler.hpp>
+#include <phd/text/encode_result.hpp>
 #include <phd/text/is_ignorable_error_handler.hpp>
 
 #include <range/v3/core.hpp>
@@ -23,19 +24,22 @@ namespace phd {
 			using __self_t = typename std::conditional<std::is_void_v<__Derived>, __utf16_with, __Derived>::type;
 
 		public:
-			using state = __text_detail::__empty_state;
-			using code_unit = __CodeUnit;
-			using code_point = unicode_code_point;
+			using state			 = __text_detail::__empty_state;
+			using code_unit		 = __CodeUnit;
+			using code_point		 = unicode_code_point;
+			using is_decode_injective = std::true_type;
+			using is_encode_injective = std::true_type;
+
 
 			template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
 			static constexpr auto decode(__InputRange&& __input, __OutputRange&& __output, state& __s, __ErrorHandler&& __error_handler) {
-				using __uInputRange = typename meta::template remove_cv_ref<__InputRange>::type;
-				using __uOutputRange = typename meta::template remove_cv_ref<__OutputRange>::type;
-				using __uErrorHandler = typename meta::template remove_cv_ref<__ErrorHandler>::type;
-				using __result_t = encoding_result<__uInputRange, __uOutputRange, state>;
+				using __uInputRange				 = typename meta::template remove_cv_ref<__InputRange>::type;
+				using __uOutputRange			 = typename meta::template remove_cv_ref<__OutputRange>::type;
+				using __uErrorHandler			 = typename meta::template remove_cv_ref<__ErrorHandler>::type;
+				using __result_t				 = decode_result<__uInputRange, __uOutputRange, state>;
 				constexpr bool __call_error_handler = !is_ignorable_error_handler_v<__uErrorHandler>;
 
-				auto __init = ranges::cbegin(__input);
+				auto __init   = ranges::cbegin(__input);
 				auto __inlast = ranges::cend(__input);
 				if constexpr (__call_error_handler) {
 					if (__init == __inlast) {
@@ -47,7 +51,7 @@ namespace phd {
 					(void)__inlast;
 				}
 
-				auto __outit = ranges::begin(__output);
+				auto __outit   = ranges::begin(__output);
 				auto __outlast = ranges::end(__output);
 
 				if constexpr (__call_error_handler) {
@@ -60,11 +64,11 @@ namespace phd {
 				}
 
 				char16_t __lead = static_cast<char16_t>(ranges::dereference(__init));
-				__init = ranges::next(__init);
+				__init		 = ranges::next(__init);
 
 				if (!__unicode_detail::__is_surrogate(__lead)) {
 					ranges::dereference(__outit) = static_cast<code_point>(__lead);
-					__outit = ranges::next(__outit);
+					__outit				    = ranges::next(__outit);
 					return __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::ok);
 				}
 				if constexpr (__call_error_handler) {
@@ -79,34 +83,34 @@ namespace phd {
 				}
 
 				auto __trail = ranges::dereference(__init);
-				__init = ranges::next(__init);
+				__init	  = ranges::next(__init);
 				if constexpr (__call_error_handler) {
 					if (!__unicode_detail::__is_trail_surrogate(__trail)) {
 						return __error_handler(__self_t{}, __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::invalid_trailing_sequence));
 					}
 				}
 				ranges::dereference(__outit) = static_cast<code_point>(__unicode_detail::__combine_surrogates(static_cast<char16_t>(__lead), static_cast<char16_t>(__trail)));
-				__outit = ranges::next(__outit);
+				__outit				    = ranges::next(__outit);
 
 				return __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::ok);
 			}
 
 			template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
 			static constexpr auto encode(__InputRange&& __input, __OutputRange&& __output, state& __s, __ErrorHandler&& __error_handler) {
-				using __uInputRange = typename meta::template remove_cv_ref<__InputRange>::type;
-				using __uOutputRange = typename meta::template remove_cv_ref<__OutputRange>::type;
-				using __uErrorHandler = typename meta::template remove_cv_ref<__ErrorHandler>::type;
-				using __result_t = encoding_result<__uInputRange, __uOutputRange, state>;
+				using __uInputRange				 = typename meta::template remove_cv_ref<__InputRange>::type;
+				using __uOutputRange			 = typename meta::template remove_cv_ref<__OutputRange>::type;
+				using __uErrorHandler			 = typename meta::template remove_cv_ref<__ErrorHandler>::type;
+				using __result_t				 = encode_result<__uInputRange, __uOutputRange, state>;
 				constexpr bool __call_error_handler = !is_ignorable_error_handler_v<__uErrorHandler>;
 
-				auto __init = ranges::cbegin(__input);
+				auto __init   = ranges::cbegin(__input);
 				auto __inlast = ranges::cend(__input);
 				if (__init == __inlast) {
 					// an exhausted sequence is fine
 					return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
 				}
 
-				auto __outit = ranges::begin(__output);
+				auto __outit   = ranges::begin(__output);
 				auto __outlast = ranges::end(__output);
 
 				if constexpr (__call_error_handler) {
@@ -119,7 +123,7 @@ namespace phd {
 				}
 
 				code_point __codepoint = ranges::dereference(__init);
-				__init = ranges::next(__init);
+				__init			   = ranges::next(__init);
 
 				if constexpr (__call_error_handler) {
 					if (__codepoint > __unicode_detail::__last_code_point) {
@@ -129,15 +133,15 @@ namespace phd {
 
 				if (__codepoint <= __unicode_detail::__last_bmp_value) {
 					ranges::dereference(__outit) = static_cast<char16_t>(__codepoint);
-					__outit = ranges::next(__outit);
+					__outit				    = ranges::next(__outit);
 				}
 				else {
 					auto normal = __codepoint - __unicode_detail::__normalizing_value;
-					auto lead = __unicode_detail::__first_lead_surrogate + ((normal & __unicode_detail::__lead_surrogate_bitmask) >> __unicode_detail::__lead_shifted_bits);
-					auto trail = __unicode_detail::__first_trail_surrogate + (normal & __unicode_detail::__trail_surrogate_bitmask);
+					auto lead   = __unicode_detail::__first_lead_surrogate + ((normal & __unicode_detail::__lead_surrogate_bitmask) >> __unicode_detail::__lead_shifted_bits);
+					auto trail  = __unicode_detail::__first_trail_surrogate + (normal & __unicode_detail::__trail_surrogate_bitmask);
 
 					ranges::dereference(__outit) = static_cast<char16_t>(lead);
-					__outit = ranges::next(__outit);
+					__outit				    = ranges::next(__outit);
 
 					if constexpr (__call_error_handler) {
 						if (__outit == __outlast) {
@@ -145,7 +149,7 @@ namespace phd {
 						}
 					}
 					ranges::dereference(__outit) = static_cast<char16_t>(trail);
-					__outit = ranges::next(__outit);
+					__outit				    = ranges::next(__outit);
 				}
 
 				return __result_t(__uInputRange(__init, __inlast), __uOutputRange(__outit, __outlast), __s, encoding_errc::ok);

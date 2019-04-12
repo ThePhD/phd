@@ -4,9 +4,10 @@
 #define PHD_TEXT_ERROR_HANDLER_HPP
 
 #include <phd/text/encoding_error.hpp>
-#include <phd/text/encoding_result.hpp>
+#include <phd/text/encode_result.hpp>
 #include <phd/text/is_unicode_code_point.hpp>
 #include <phd/text/is_code_point_replaceable.hpp>
+#include <phd/text/is_code_unit_replaceable.hpp>
 #include <phd/text/code_point.hpp>
 #include <phd/text/c_string_view.hpp>
 #include <phd/text/detail/unicode_detail.hpp>
@@ -42,38 +43,46 @@ inline namespace __abi_v0 {
 
 	struct replacement_text_error_handler {
 		template <typename __Encoding, typename __InputRange, typename __OutputRange, typename __State>
-		constexpr auto operator()(const __Encoding& enc, encoding_result<__InputRange, __OutputRange, __State> __result) const {
+		constexpr auto operator()(const __Encoding& enc, encode_result<__InputRange, __OutputRange, __State> __result) const {
+			using __uOutputRange = typename meta::remove_cv_ref<__OutputRange>::type;
+
 			auto __outit   = ranges::begin(__result.output);
 			auto __outlast = ranges::end(__result.output);
-			if (__outit == __outlast) {
+			if (__result.error_code == encoding_errc::insufficient_output_space || __outit == __outlast) {
 				// BAIL
 				return __result;
 			}
 
-			using __input_code_point = encoding_code_point_t<__Encoding>;
-
-			__input_code_point __wut[2];
-			if constexpr (is_code_point_replaceable_v<__Encoding>) {
-				__wut[0] = static_cast<__input_code_point>(__Encoding::replacement_code_point);
+			if constexpr (is_code_unit_replaceable_v<__Encoding>) {
+				(*__outit)	 = __Encoding::replacement_code_unit;
+				__outit		 = ranges::next(__outit);
+				__result.output = __uOutputRange(std::move(__outit), std::move(__outlast));
 			}
 			else {
-				__wut[0] = static_cast<__input_code_point>(is_unicode_code_point_v<__input_code_point> ? U'\uFFFD' : U'?');
-			}
-			__wut[1] = static_cast<__input_code_point>(0);
-			const basic_c_string_view<__input_code_point> __wut_range(__wut, 1);
+				using __input_code_point = encoding_code_point_t<__Encoding>;
+				__input_code_point __wut[2];
+				if constexpr (is_code_point_replaceable_v<__Encoding>) {
+					__wut[0] = static_cast<__input_code_point>(__Encoding::replacement_code_point);
+				}
+				else {
+					__wut[0] = static_cast<__input_code_point>(is_unicode_code_point_v<__input_code_point> ? __unicode_detail::__replacement : __unicode_detail::__ascii_replacement);
+				}
+				__wut[1] = static_cast<__input_code_point>(0);
+				const basic_c_string_view<__input_code_point> __wut_range(__wut, 1);
 
-			__State __fresh_state{};
-			auto __encresult    = enc.encode(__wut_range, std::move(__result.output), __fresh_state, assume_valid_text_error_handler{});
-			__result.output	= std::move(__encresult.output);
+				__State __fresh_state{};
+				auto __encresult = enc.encode(__wut_range, std::move(__result.output), __fresh_state, assume_valid_text_error_handler{});
+				__result.output  = std::move(__encresult.output);
+			}
+
 			__result.error_code = encoding_errc::ok;
 
 			return __result;
 		}
 
 		template <typename __Encoding, typename __InputRange, typename __OutputRange, typename __State>
-		constexpr auto operator()(const __Encoding&, decoding_result<__InputRange, __OutputRange, __State> __result) const {
+		constexpr auto operator()(const __Encoding&, decode_result<__InputRange, __OutputRange, __State> __result) const {
 			using __output_code_point = encoding_code_point_t<__Encoding>;
-			//(void)enc; // UNUSED
 
 			auto __outit   = ranges::begin(__result.output);
 			auto __outlast = ranges::end(__result.output);
@@ -93,6 +102,7 @@ inline namespace __abi_v0 {
 					(*__outit) = static_cast<__output_code_point>(__unicode_detail::__ascii_replacement);
 				}
 			}
+			__outit = ranges::next(__outit);
 
 			__result.output	= __OutputRange(__outit, __outlast);
 			__result.error_code = encoding_errc::ok;

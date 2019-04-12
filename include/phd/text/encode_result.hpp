@@ -15,7 +15,7 @@
 namespace phd {
 
 	template <typename __Input, typename __Output, typename __State>
-	struct encoding_result {
+	struct encode_result {
 		__Input input;
 		__Output output;
 		__State& state;
@@ -23,12 +23,12 @@ namespace phd {
 		bool handled_error;
 
 		template <typename __InRange, typename __OutRange, typename __EncodingState>
-		constexpr encoding_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code = encoding_errc::ok)
-		: encoding_result(std::forward<__InRange>(__input), std::forward<__OutRange>(__output), std::forward<__EncodingState>(__state), __error_code, __error_code != encoding_errc::ok) {
+		constexpr encode_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code = encoding_errc::ok)
+		: encode_result(std::forward<__InRange>(__input), std::forward<__OutRange>(__output), std::forward<__EncodingState>(__state), __error_code, __error_code != encoding_errc::ok) {
 		}
 
 		template <typename __InRange, typename __OutRange, typename __EncodingState>
-		constexpr encoding_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code, bool __handled_error)
+		constexpr encode_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code, bool __handled_error)
 		: input(std::forward<__InRange>(__input)), output(std::forward<__OutRange>(__output)), state(std::forward<__EncodingState>(__state)), error_code(__error_code), handled_error(__handled_error) {
 		}
 
@@ -39,7 +39,7 @@ namespace phd {
 	};
 
 	template <typename __Input, typename __Output, typename __State>
-	struct decoding_result {
+	struct decode_result {
 		__Input input;
 		__Output output;
 		__State& state;
@@ -47,12 +47,12 @@ namespace phd {
 		bool handled_error;
 
 		template <typename __InRange, typename __OutRange, typename __EncodingState>
-		constexpr decoding_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code = encoding_errc::ok)
-		: decoding_result(std::forward<__InRange>(__input), std::forward<__OutRange>(__output), std::forward<__EncodingState>(__state), __error_code, __error_code != encoding_errc::ok) {
+		constexpr decode_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code = encoding_errc::ok)
+		: decode_result(std::forward<__InRange>(__input), std::forward<__OutRange>(__output), std::forward<__EncodingState>(__state), __error_code, __error_code != encoding_errc::ok) {
 		}
 
 		template <typename __InRange, typename __OutRange, typename __EncodingState>
-		constexpr decoding_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code, bool __handled_error)
+		constexpr decode_result(__InRange&& __input, __OutRange&& __output, __EncodingState&& __state, encoding_errc __error_code, bool __handled_error)
 		: input(std::forward<__InRange>(__input)), output(std::forward<__OutRange>(__output)), state(std::forward<__EncodingState>(__state)), error_code(__error_code), handled_error(__handled_error) {
 		}
 

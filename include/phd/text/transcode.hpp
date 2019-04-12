@@ -3,7 +3,7 @@
 #ifndef PHD_TEXT_TRANSCODE_HPP
 #define PHD_TEXT_TRANSCODE_HPP
 
-#include <phd/text/encoding_result.hpp>
+#include <phd/text/encode_result.hpp>
 #include <phd/text/error_handler.hpp>
 #include <phd/text/state.hpp>
 #include <phd/text/code_point.hpp>

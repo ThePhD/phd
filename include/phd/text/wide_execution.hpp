@@ -5,6 +5,7 @@
 
 #include <phd/text/unicode_code_point.hpp>
 #include <phd/text/execution.hpp>
+#include <phd/text/encode_result.hpp>
 #include <phd/text/error_handler.hpp>
 #include <phd/text/c_string_view.hpp>
 #include <phd/text/empty_state.hpp>
@@ -29,28 +30,33 @@ namespace phd {
 
 	struct wide_execution {
 #ifdef _WIN32
-		using state = __text_detail::__empty_state;
+		using __state = __text_detail::__empty_state;
 #else
-		struct state {
+		struct __state {
 			std::mbstate_t wide_state;
 			execution::state narrow_state;
 
-			state() = default;
+			__state() = default;
 		};
 #endif // Windows
 
-		using code_unit = wchar_t;
-		using code_point = unicode_code_point;
+		// UTF32 on Linux; is fully injective
+		// UTF16 on Windows; is fully injective
+		using state			 = __state;
+		using code_unit		 = wchar_t;
+		using code_point		 = unicode_code_point;
+		using is_decode_injective = std::true_type;
+		using is_encode_injective = std::true_type;
 
 		template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
 		static constexpr auto encode(__InputRange&& __input, __OutputRange&& __output, state& __s, __ErrorHandler&& __error_handler) {
-			using __uInputRange = typename meta::template remove_cv_ref<__InputRange>::type;
-			using __uOutputRange = typename meta::template remove_cv_ref<__OutputRange>::type;
-			using __uErrorHandler = typename meta::remove_cv_ref<__ErrorHandler>::type;
-			using __result_t = encoding_result<__uInputRange, __uOutputRange, state>;
+			using __uInputRange				 = typename meta::template remove_cv_ref<__InputRange>::type;
+			using __uOutputRange			 = typename meta::template remove_cv_ref<__OutputRange>::type;
+			using __uErrorHandler			 = typename meta::remove_cv_ref<__ErrorHandler>::type;
+			using __result_t				 = encode_result<__uInputRange, __uOutputRange, state>;
 			constexpr bool __call_error_handler = !is_ignorable_error_handler_v<__uErrorHandler>;
 #ifdef _WIN32
-			using __u16e = __text_detail::__utf16_with<void, wchar_t, false>;
+			using __u16e			  = __text_detail::__utf16_with<void, wchar_t, false>;
 			using __intermediate_state = typename __u16e::state;
 
 			__u16e __u16enc{};
@@ -61,7 +67,7 @@ namespace phd {
 			}
 			return __result_t(std::move(__result.input), std::move(__result.output), __s, __result.error_code);
 #else
-			auto __init = ranges::cbegin(__input);
+			auto __init   = ranges::cbegin(__input);
 			auto __inlast = ranges::cend(__input);
 
 			if (__init == __inlast) {
@@ -69,7 +75,7 @@ namespace phd {
 				return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
 			}
 
-			auto __outit = ranges::begin(__output);
+			auto __outit   = ranges::begin(__output);
 			auto __outlast = ranges::end(__output);
 
 			constexpr const std::size_t __state_max = 32;
@@ -100,7 +106,7 @@ namespace phd {
 				}
 			}
 			ranges::dereference(__outit) = __unit;
-			__outit = ranges::next(__outit);
+			__outit				    = ranges::next(__outit);
 
 			return __result_t(std::move(__result.input), __uOutputRange(__outit, __outlast), __s, __result.error_code);
 #endif // Windows shit
@@ -108,13 +114,13 @@ namespace phd {
 
 		template <typename __InputRange, typename __OutputRange, typename __ErrorHandler>
 		static constexpr auto decode(__InputRange&& __input, __OutputRange&& __output, state& __s, __ErrorHandler&& __error_handler) {
-			using __uInputRange = typename meta::template remove_cv_ref<__InputRange>::type;
-			using __uOutputRange = typename meta::template remove_cv_ref<__OutputRange>::type;
-			using __uErrorHandler = typename meta::remove_cv_ref<__ErrorHandler>::type;
-			using __result_t = encoding_result<__uInputRange, __uOutputRange, state>;
+			using __uInputRange				 = typename meta::template remove_cv_ref<__InputRange>::type;
+			using __uOutputRange			 = typename meta::template remove_cv_ref<__OutputRange>::type;
+			using __uErrorHandler			 = typename meta::remove_cv_ref<__ErrorHandler>::type;
+			using __result_t				 = decode_result<__uInputRange, __uOutputRange, state>;
 			constexpr bool __call_error_handler = !is_ignorable_error_handler_v<__uErrorHandler>;
 #ifdef _WIN32
-			using __u16e = __text_detail::__utf16_with<void, wchar_t, false>;
+			using __u16e			  = __text_detail::__utf16_with<void, wchar_t, false>;
 			using __intermediate_state = typename __u16e::state;
 
 			__u16e __u16enc{};
@@ -128,7 +134,7 @@ namespace phd {
 			return __result_t(std::move(__result.input), std::move(__result.output), __s, __result.error_code, __result.handled_error);
 #else
 
-			auto __init = ranges::cbegin(__input);
+			auto __init   = ranges::cbegin(__input);
 			auto __inlast = ranges::cend(__input);
 
 			if (__init == __inlast) {
@@ -136,7 +142,7 @@ namespace phd {
 				return __result_t(std::forward<__InputRange>(__input), std::forward<__OutputRange>(__output), __s, encoding_errc::ok);
 			}
 
-			auto __outit = ranges::begin(__output);
+			auto __outit   = ranges::begin(__output);
 			auto __outlast = ranges::end(__output);
 
 			if constexpr (__call_error_handler) {
@@ -150,7 +156,7 @@ namespace phd {
 			std::size_t __state_count = 0;
 			for (; __state_count < __state_max;) {
 				code_unit __unit = ranges::dereference(__init);
-				__init = ranges::next(__init);
+				__init		  = ranges::next(__init);
 #ifdef _MSC_VER
 				std::size_t __res;
 				errno_t __err = wcrtomb_s(std::addressof(__res), __pray_for_state, __state_max, __unit, std::addressof(__s.wide_state));

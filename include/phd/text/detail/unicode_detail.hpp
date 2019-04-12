@@ -14,13 +14,13 @@ namespace __unicode_detail {
 	inline constexpr char32_t __last_code_point = 0x10FFFF;
 
 	inline constexpr char32_t __first_lead_surrogate = 0xD800;
-	inline constexpr char32_t __last_lead_surrogate = 0xDBFF;
+	inline constexpr char32_t __last_lead_surrogate  = 0xDBFF;
 
 	inline constexpr char32_t __first_trail_surrogate = 0xDC00;
-	inline constexpr char32_t __last_trail_surrogate = 0xDFFF;
+	inline constexpr char32_t __last_trail_surrogate  = 0xDFFF;
 
 	inline constexpr char32_t __first_surrogate = __first_lead_surrogate;
-	inline constexpr char32_t __last_surrogate = __last_trail_surrogate;
+	inline constexpr char32_t __last_surrogate  = __last_trail_surrogate;
 
 	inline constexpr bool __is_lead_surrogate(char32_t __value) {
 		return __value >= __first_lead_surrogate && __value <= __last_lead_surrogate;
@@ -40,29 +40,29 @@ namespace __unicode_detail {
 	inline constexpr char32_t __last_5byte_value = 0x3FFFFFF;
 	inline constexpr char32_t __last_6byte_value = 0x7FFFFFFF;
 
-	inline constexpr char8_t __start_1byte_mask = 0x80u;
+	inline constexpr char8_t __start_1byte_mask		  = 0x80u;
 	inline constexpr char8_t __start_1byte_continuation = 0x00u;
-	inline constexpr char8_t __start_1byte_shift = 7u;
-	inline constexpr char8_t __start_2byte_mask = 0xC0u;
+	inline constexpr char8_t __start_1byte_shift		  = 7u;
+	inline constexpr char8_t __start_2byte_mask		  = 0xC0u;
 	inline constexpr char8_t __start_2byte_continuation = __start_2byte_mask;
-	inline constexpr char8_t __start_2byte_shift = 5u;
-	inline constexpr char8_t __start_3byte_mask = 0xE0u;
+	inline constexpr char8_t __start_2byte_shift		  = 5u;
+	inline constexpr char8_t __start_3byte_mask		  = 0xE0u;
 	inline constexpr char8_t __start_3byte_continuation = __start_3byte_mask;
-	inline constexpr char8_t __start_3byte_shift = 4u;
-	inline constexpr char8_t __start_4byte_mask = 0xF0u;
+	inline constexpr char8_t __start_3byte_shift		  = 4u;
+	inline constexpr char8_t __start_4byte_mask		  = 0xF0u;
 	inline constexpr char8_t __start_4byte_continuation = __start_4byte_mask;
-	inline constexpr char8_t __start_4byte_shift = 3u;
-	inline constexpr char8_t __start_5byte_mask = 0xF8u;
+	inline constexpr char8_t __start_4byte_shift		  = 3u;
+	inline constexpr char8_t __start_5byte_mask		  = 0xF8u;
 	inline constexpr char8_t __start_5byte_continuation = __start_5byte_mask;
-	inline constexpr char8_t __start_5byte_shift = 2u;
-	inline constexpr char8_t __start_6byte_mask = 0xFCu;
+	inline constexpr char8_t __start_5byte_shift		  = 2u;
+	inline constexpr char8_t __start_6byte_mask		  = 0xFCu;
 	inline constexpr char8_t __start_6byte_continuation = __start_6byte_mask;
-	inline constexpr char8_t __start_6byte_shift = 1u;
+	inline constexpr char8_t __start_6byte_shift		  = 1u;
 
-	inline constexpr char8_t __continuation_mask = 0xC0u;
-	inline constexpr char8_t __continuation_signature = 0x80u;
+	inline constexpr char8_t __continuation_mask		 = 0xC0u;
+	inline constexpr char8_t __continuation_signature  = 0x80u;
 	inline constexpr char8_t __continuation_mask_value = 0x3Fu;
-	inline constexpr char8_t __single_mask_value = 0x7Fu;
+	inline constexpr char8_t __single_mask_value		 = 0x7Fu;
 
 	inline constexpr bool __is_invalid(char8_t __b) {
 		return __b == 0xC0 || __b == 0xC1 || __b > 0xF4;
@@ -136,13 +136,14 @@ namespace __unicode_detail {
 	}
 
 	// utf16 related
-	inline constexpr char32_t __last_bmp_value = 0xFFFF;
-	inline constexpr char32_t __normalizing_value = 0x10000;
-	inline constexpr int __lead_surrogate_bitmask = 0xFFC00;
+	inline constexpr char32_t __last_ascii_value   = 0x7F;
+	inline constexpr char32_t __last_bmp_value	= 0xFFFF;
+	inline constexpr char32_t __normalizing_value  = 0x10000;
+	inline constexpr int __lead_surrogate_bitmask  = 0xFFC00;
 	inline constexpr int __trail_surrogate_bitmask = 0x3FF;
-	inline constexpr int __lead_shifted_bits = 10;
-	inline constexpr char32_t __replacement = 0xFFFD;
-	inline constexpr char32_t __ascii_replacement = 0x003F;
+	inline constexpr int __lead_shifted_bits	  = 10;
+	inline constexpr char32_t __replacement		  = 0xFFFD;
+	inline constexpr char32_t __ascii_replacement  = 0x003F;
 
 	inline char32_t __combine_surrogates(char16_t __lead, char16_t __trail) {
 		auto __hibits = __lead - __first_lead_surrogate;

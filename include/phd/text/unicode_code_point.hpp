@@ -5,6 +5,7 @@
 
 namespace phd {
 
+	// TODO: what are the merits of a strong type here?
 	using unicode_code_point = char32_t;
 
 } // namespace phd
