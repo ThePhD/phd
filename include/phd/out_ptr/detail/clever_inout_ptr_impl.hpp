@@ -1,18 +1,18 @@
 #pragma once
 
-#ifndef PHD_OUT_PTR_DETAIL_CLEVER_INOUT_PTR_IMPL_HPP
-#define PHD_OUT_PTR_DETAIL_CLEVER_INOUT_PTR_IMPL_HPP
+#ifndef PHD_OUT_PTR_OUT_PTR_DETAIL_CLEVER_INOUT_PTR_IMPL_HPP
+#define PHD_OUT_PTR_OUT_PTR_DETAIL_CLEVER_INOUT_PTR_IMPL_HPP
 
 #include <phd/out_ptr/detail/base_inout_ptr_impl.hpp>
 #include <phd/out_ptr/detail/voidpp_op.hpp>
 #include <phd/meta/is_specialization_of.hpp>
-#include <phd/meta/pointer_of.hpp>
+#include <phd/out_ptr/pointer_of.hpp>
 
 #include <memory>
 #include <tuple>
 #include <utility>
 
-namespace phd::out_ptr_detail {
+namespace phd::detail {
 
 	template <typename Smart, typename Pointer, typename Args, typename List, typename = void>
 	struct clever_inout_ptr_impl : public base_inout_ptr_impl<Smart, Pointer, Args, List> {
@@ -26,11 +26,11 @@ namespace phd::out_ptr_detail {
 	template <typename T, typename D, typename Pointer>
 	struct clever_inout_ptr_impl<std::unique_ptr<T, D>, Pointer, std::tuple<>, std::index_sequence<>,
 		std::enable_if_t<
-			std::is_same_v<meta::pointer_of_t<std::unique_ptr<T, D>>, Pointer> || std::is_base_of_v<meta::pointer_of_t<std::unique_ptr<T, D>>, Pointer> || !std::is_convertible_v<meta::pointer_of_t<std::unique_ptr<T, D>>, Pointer>>>
+			std::is_same_v<pointer_of_t<std::unique_ptr<T, D>>, Pointer> || std::is_base_of_v<pointer_of_t<std::unique_ptr<T, D>>, Pointer> || !std::is_convertible_v<pointer_of_t<std::unique_ptr<T, D>>, Pointer>>>
 	: voidpp_op<clever_inout_ptr_impl<std::unique_ptr<T, D>, Pointer, std::tuple<>, std::index_sequence<>>, Pointer> {
 	public:
 		typedef std::unique_ptr<T, D> Smart;
-		typedef meta::pointer_of_or_t<Smart, Pointer> source_pointer;
+		typedef pointer_of_or_t<Smart, Pointer> source_pointer;
 
 	private:
 		using can_aliasing_optimization = std::integral_constant<bool,
@@ -57,9 +57,9 @@ namespace phd::out_ptr_detail {
 #else
 			// implementation has Pointer as second member: shift, align, alias
 			constexpr const std::size_t memory_start = sizeof(D) + (sizeof(D) % alignof(D));
-			std::size_t max_space = sizeof(Smart) - memory_start;
-			void* source = static_cast<void*>(static_cast<char*>(static_cast<void*>(std::addressof(ptr))) + memory_start);
-			void* target = std::align(alignof(source_pointer), sizeof(source_pointer), source, max_space);
+			std::size_t max_space				 = sizeof(Smart) - memory_start;
+			void* source						 = static_cast<void*>(static_cast<char*>(static_cast<void*>(std::addressof(ptr))) + memory_start);
+			void* target						 = std::align(alignof(source_pointer), sizeof(source_pointer), source, max_space);
 #endif
 			// get direct Pointer
 			this->m_target_ptr = static_cast<Pointer*>(target);
@@ -76,7 +76,7 @@ namespace phd::out_ptr_detail {
 		}
 		clever_inout_ptr_impl(clever_inout_ptr_impl&& right) noexcept = default;
 		clever_inout_ptr_impl& operator=(clever_inout_ptr_impl&& right) noexcept = default;
-		clever_inout_ptr_impl(const clever_inout_ptr_impl&) = delete;
+		clever_inout_ptr_impl(const clever_inout_ptr_impl&)				   = delete;
 		clever_inout_ptr_impl& operator=(const clever_inout_ptr_impl&) = delete;
 
 		operator Pointer*() noexcept {
@@ -87,6 +87,6 @@ namespace phd::out_ptr_detail {
 		}
 		// no need for destructor: aliasing directly, and realloc
 	};
-} // namespace phd::out_ptr_detail
+} // namespace phd::detail
 
-#endif // PHD_OUT_PTR_DETAIL_CLEVER_INOUT_PTR_IMPL_HPP
+#endif // PHD_OUT_PTR_OUT_PTR_DETAIL_CLEVER_INOUT_PTR_IMPL_HPP

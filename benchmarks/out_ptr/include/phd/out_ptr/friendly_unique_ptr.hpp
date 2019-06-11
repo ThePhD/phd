@@ -1,4 +1,10 @@
-// Copyright � 2018 ThePhD
+//  Copyright ⓒ 2018-2019 ThePhD.
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+//
+//  See http://www.boost.org/libs/out_ptr/ for documentation.
 
 #pragma once
 
@@ -15,65 +21,111 @@ namespace std {
 #define _NOEXCEPT noexcept
 #endif // MSVC's noexcept is properly boxed from the user in later releases
 
+#ifndef PHD_OUT_PTR_HAS_FRIENDLY_UNIQUE_PTR
 #define PHD_OUT_PTR_HAS_FRIENDLY_UNIQUE_PTR 1
+#endif
 
-	// CLASS TEMPLATE friendly_unique_ptr SCALAR
+	template <class _Ty,
+		class _Dx>
+	class friendly_unique_ptr_base { // stores pointer and deleter
+	public:
+		typedef remove_reference_t<_Dx> _Dx_noref;
+		typedef typename _Get_deleter_pointer_type<_Ty, _Dx_noref>::type pointer;
+
+		template <class _Ptr2,
+			class _Dx2>
+		friendly_unique_ptr_base(_Ptr2 _Ptr, _Dx2&& _Dt)
+		: _Mypair(_One_then_variadic_args_t(), ::std::forward<_Dx2>(_Dt), _Ptr) { // construct with compatible pointer and deleter
+		}
+
+		template <class _Ptr2>
+		constexpr friendly_unique_ptr_base(_Ptr2 _Ptr)
+		: _Mypair(_Zero_then_variadic_args_t(), _Ptr) { // construct with compatible pointer
+		}
+
+		_NODISCARD _Dx& get_deleter() noexcept { // return reference to deleter
+			return (_Mypair._Get_first());
+		}
+
+		_NODISCARD const _Dx& get_deleter() const noexcept { // return const reference to deleter
+			return (_Mypair._Get_first());
+		}
+
+		pointer& _Myptr() noexcept { // return reference to pointer
+#if _MSC_VER < 1920
+			return (_Mypair._Get_second());
+#else
+			return (_Mypair._Myval2);
+#endif
+		}
+
+		const pointer& _Myptr() const noexcept { // return const reference to pointer
+#if _MSC_VER < 1920
+			return (_Mypair._Get_second());
+#else
+			return (_Mypair._Myval2);
+#endif
+		}
+
+		_Compressed_pair<_Dx, pointer> _Mypair;
+	};
+
 	template <class _Ty,
 		class _Dx> // = default_delete<_Ty>
 	class friendly_unique_ptr
-	: public _Unique_ptr_base<_Ty, _Dx> { // non-copyable pointer to an object
+	: public friendly_unique_ptr_base<_Ty, _Dx> { // non-copyable pointer to an object
 	public:
-		typedef _Unique_ptr_base<_Ty, _Dx> _Mybase;
+		typedef friendly_unique_ptr_base<_Ty, _Dx> _Mybase;
 		typedef typename _Mybase::pointer pointer;
 		typedef _Ty element_type;
 		typedef _Dx deleter_type;
 
 		using _Mybase::get_deleter;
 
-		template <class _Dx2 = _Dx,
+		template <class _Dx2				= _Dx,
 			_Unique_ptr_enable_default_t<_Dx2> = 0>
-		constexpr friendly_unique_ptr() _NOEXCEPT
+		constexpr friendly_unique_ptr() noexcept
 		: _Mybase(pointer()) { // default construct
 		}
 
-		template <class _Dx2 = _Dx,
+		template <class _Dx2				= _Dx,
 			_Unique_ptr_enable_default_t<_Dx2> = 0>
-		constexpr friendly_unique_ptr(nullptr_t) _NOEXCEPT
+		constexpr friendly_unique_ptr(nullptr_t) noexcept
 		: _Mybase(pointer()) { // null pointer construct
 		}
 
-		friendly_unique_ptr& operator=(nullptr_t) _NOEXCEPT { // assign a null pointer
+		friendly_unique_ptr& operator=(nullptr_t) noexcept { // assign a null pointer
 			reset();
 			return (*this);
 		}
 
-		template <class _Dx2 = _Dx,
+		template <class _Dx2				= _Dx,
 			_Unique_ptr_enable_default_t<_Dx2> = 0>
-		explicit friendly_unique_ptr(pointer _Ptr) _NOEXCEPT
+		explicit friendly_unique_ptr(pointer _Ptr) noexcept
 		: _Mybase(_Ptr) { // construct with pointer
 		}
 
-		template <class _Dx2 = _Dx,
+		template <class _Dx2								 = _Dx,
 			enable_if_t<is_constructible_v<_Dx2, const _Dx2&>, int> = 0>
-		friendly_unique_ptr(pointer _Ptr, const _Dx& _Dt) _NOEXCEPT
+		friendly_unique_ptr(pointer _Ptr, const _Dx& _Dt) noexcept
 		: _Mybase(_Ptr, _Dt) { // construct with pointer and (maybe const) deleter&
 		}
 
 		template <class _Dx2 = _Dx,
 			enable_if_t<conjunction_v<negation<is_reference<_Dx2>>,
 						  is_constructible<_Dx2, _Dx2>>,
-				int> = 0>
-		friendly_unique_ptr(pointer _Ptr, _Dx&& _Dt) _NOEXCEPT
+				int>		 = 0>
+		friendly_unique_ptr(pointer _Ptr, _Dx&& _Dt) noexcept
 		: _Mybase(_Ptr, _STD move(_Dt)) { // construct by moving deleter
 		}
 
 		template <class _Dx2 = _Dx,
 			enable_if_t<conjunction_v<is_reference<_Dx2>,
 						  is_constructible<_Dx2, remove_reference_t<_Dx2>>>,
-				int> = 0>
+				int>		 = 0>
 		friendly_unique_ptr(pointer, remove_reference_t<_Dx>&&) = delete;
 
-		friendly_unique_ptr(friendly_unique_ptr&& _Right) _NOEXCEPT
+		friendly_unique_ptr(friendly_unique_ptr&& _Right) noexcept
 		: _Mybase(_Right.release(),
 			  _STD forward<_Dx>(_Right.get_deleter())) { // construct by moving _Right
 		}
@@ -84,7 +136,7 @@ namespace std {
 						  is_convertible<typename friendly_unique_ptr<_Ty2, _Dx2>::pointer, pointer>,
 						  conditional_t<is_reference_v<_Dx>, is_same<_Dx2, _Dx>, is_convertible<_Dx2, _Dx>>>,
 				int> = 0>
-		friendly_unique_ptr(friendly_unique_ptr<_Ty2, _Dx2>&& _Right) _NOEXCEPT
+		friendly_unique_ptr(friendly_unique_ptr<_Ty2, _Dx2>&& _Right) noexcept
 		: _Mybase(_Right.release(),
 			  _STD forward<_Dx2>(_Right.get_deleter())) { // construct by moving _Right
 		}
@@ -94,7 +146,7 @@ namespace std {
 			enable_if_t<conjunction_v<is_convertible<_Ty2*, _Ty*>,
 						  is_same<_Dx, default_delete<_Ty>>>,
 				int> = 0>
-		friendly_unique_ptr(auto_ptr<_Ty2>&& _Right) _NOEXCEPT
+		friendly_unique_ptr(auto_ptr<_Ty2>&& _Right) noexcept
 		: _Mybase(_Right.release()) { // construct by moving _Right
 		}
 #endif /* _HAS_AUTO_PTR_ETC */
@@ -105,26 +157,26 @@ namespace std {
 						  is_assignable<_Dx&, _Dx2>,
 						  is_convertible<typename friendly_unique_ptr<_Ty2, _Dx2>::pointer, pointer>>,
 				int> = 0>
-		friendly_unique_ptr& operator=(friendly_unique_ptr<_Ty2, _Dx2>&& _Right) _NOEXCEPT { // assign by moving _Right
+		friendly_unique_ptr& operator=(friendly_unique_ptr<_Ty2, _Dx2>&& _Right) noexcept { // assign by moving _Right
 			reset(_Right.release());
-			this->get_deleter() = _STD forward<_Dx2>(_Right.get_deleter());
+			this->get_deleter()	= _STD forward<_Dx2>(_Right.get_deleter());
 			return (*this);
 		}
 
-		friendly_unique_ptr& operator=(friendly_unique_ptr&& _Right) _NOEXCEPT { // assign by moving _Right
-			if (this != _STD addressof(_Right)) {						   // different, do the move
+		friendly_unique_ptr& operator=(friendly_unique_ptr&& _Right) noexcept { // assign by moving _Right
+			if (this != _STD addressof(_Right)) {						  // different, do the move
 				reset(_Right.release());
-				this->get_deleter() = _STD forward<_Dx>(_Right.get_deleter());
+				this->get_deleter()= _STD forward<_Dx>(_Right.get_deleter());
 			}
 			return (*this);
 		}
 
-		void swap(friendly_unique_ptr& _Right) _NOEXCEPT { // swap elements
+		void swap(friendly_unique_ptr& _Right) noexcept { // swap elements
 			_Swap_adl(this->_Myptr(), _Right._Myptr());
 			_Swap_adl(this->get_deleter(), _Right.get_deleter());
 		}
 
-		~friendly_unique_ptr() _NOEXCEPT { // destroy the object
+		~friendly_unique_ptr() noexcept { // destroy the object
 			if (get() != pointer()) {
 				this->get_deleter()(get());
 			}
@@ -134,30 +186,34 @@ namespace std {
 			return (*get());
 		}
 
-		_NODISCARD pointer operator->() const _NOEXCEPT { // return pointer to class object
+		_NODISCARD pointer operator->() const noexcept { // return pointer to class object
 			return (this->_Myptr());
 		}
 
-		_NODISCARD pointer get() const _NOEXCEPT { // return pointer to object
+		_NODISCARD pointer get() const noexcept { // return pointer to object
 			return (this->_Myptr());
 		}
 
-		pointer& friendly_get() _NOEXCEPT { // return pointer to object
-			return this->_Myptr();
+		_NODISCARD pointer& friendly_get() noexcept { // return pointer to object
+			return (this->_Myptr());
 		}
 
-		explicit operator bool() const _NOEXCEPT { // test for non-null pointer
+		_NODISCARD const pointer& friendly_get() const noexcept { // return pointer to object
+			return (this->_Myptr());
+		}
+
+		explicit operator bool() const noexcept { // test for non-null pointer
 			return (get() != pointer());
 		}
 
-		pointer release() _NOEXCEPT { // yield ownership of pointer
-			pointer _Ans = get();
+		pointer release() noexcept { // yield ownership of pointer
+			pointer _Ans   = get();
 			this->_Myptr() = pointer();
 			return (_Ans);
 		}
 
-		void reset(pointer _Ptr = pointer()) _NOEXCEPT { // establish new pointer
-			pointer _Old = get();
+		void reset(pointer _Ptr = pointer()) noexcept { // establish new pointer
+			pointer _Old   = get();
 			this->_Myptr() = _Ptr;
 			if (_Old != pointer()) {
 				this->get_deleter()(_Old);
@@ -170,7 +226,9 @@ namespace std {
 
 #elif defined(_LIBCPP_VERSION)
 
+#ifndef PHD_OUT_PTR_HAS_FRIENDLY_UNIQUE_PTR
 #define PHD_OUT_PTR_HAS_FRIENDLY_UNIQUE_PTR 1
+#endif
 
 	template <class _Tp, class _Dp = default_delete<_Tp>>
 	class _LIBCPP_TEMPLATE_VIS friendly_unique_ptr {
@@ -226,32 +284,32 @@ namespace std {
 
 	public:
 		template <bool _Dummy = true,
-			class = _EnableIfDeleterDefaultConstructible<_Dummy>>
+			class		  = _EnableIfDeleterDefaultConstructible<_Dummy>>
 		_LIBCPP_INLINE_VISIBILITY constexpr friendly_unique_ptr() noexcept
 		: __ptr_(pointer()) {
 		}
 
 		template <bool _Dummy = true,
-			class = _EnableIfDeleterDefaultConstructible<_Dummy>>
+			class		  = _EnableIfDeleterDefaultConstructible<_Dummy>>
 		_LIBCPP_INLINE_VISIBILITY constexpr friendly_unique_ptr(nullptr_t) noexcept
 		: __ptr_(pointer()) {
 		}
 
 		template <bool _Dummy = true,
-			class = _EnableIfDeleterDefaultConstructible<_Dummy>>
+			class		  = _EnableIfDeleterDefaultConstructible<_Dummy>>
 		_LIBCPP_INLINE_VISIBILITY explicit friendly_unique_ptr(pointer __p) noexcept
 		: __ptr_(__p) {
 		}
 
 		template <bool _Dummy = true,
-			class = _EnableIfDeleterConstructible<_LValRefType<_Dummy>>>
+			class		  = _EnableIfDeleterConstructible<_LValRefType<_Dummy>>>
 		_LIBCPP_INLINE_VISIBILITY
 		friendly_unique_ptr(pointer __p, _LValRefType<_Dummy> __d) noexcept
 		: __ptr_(__p, __d) {
 		}
 
 		template <bool _Dummy = true,
-			class = _EnableIfDeleterConstructible<_GoodRValRefType<_Dummy>>>
+			class		  = _EnableIfDeleterConstructible<_GoodRValRefType<_Dummy>>>
 		_LIBCPP_INLINE_VISIBILITY
 		friendly_unique_ptr(pointer __p, _GoodRValRefType<_Dummy> __d) noexcept
 		: __ptr_(__p, _VSTD::move(__d)) {
@@ -260,7 +318,7 @@ namespace std {
 		}
 
 		template <bool _Dummy = true,
-			class = _EnableIfDeleterConstructible<_BadRValRefType<_Dummy>>>
+			class		  = _EnableIfDeleterConstructible<_BadRValRefType<_Dummy>>>
 		_LIBCPP_INLINE_VISIBILITY
 		friendly_unique_ptr(pointer __p, _BadRValRefType<_Dummy> __d)
 			= delete;
@@ -421,14 +479,14 @@ namespace std {
 
 		_LIBCPP_INLINE_VISIBILITY
 		pointer release() _NOEXCEPT {
-			pointer __t = __ptr_.first();
+			pointer __t    = __ptr_.first();
 			__ptr_.first() = pointer();
 			return __t;
 		}
 
 		_LIBCPP_INLINE_VISIBILITY
 		void reset(pointer __p = pointer()) _NOEXCEPT {
-			pointer __tmp = __ptr_.first();
+			pointer __tmp  = __ptr_.first();
 			__ptr_.first() = __p;
 			if (__tmp)
 				__ptr_.second()(__tmp);
@@ -442,7 +500,9 @@ namespace std {
 
 #elif defined(__GLIBCXX__)
 
+#ifndef PHD_OUT_PTR_HAS_FRIENDLY_UNIQUE_PTR
 #define PHD_OUT_PTR_HAS_FRIENDLY_UNIQUE_PTR 1
+#endif
 
 	/// 20.7.1.2 friendly_unique_ptr for single objects.
 	template <typename _Tp, typename _Dp = default_delete<_Tp>>
@@ -454,7 +514,7 @@ namespace std {
 		__uniq_ptr_impl<_Tp, _Dp> _M_t;
 
 	public:
-		using pointer = typename __uniq_ptr_impl<_Tp, _Dp>::pointer;
+		using pointer	 = typename __uniq_ptr_impl<_Tp, _Dp>::pointer;
 		using element_type = _Tp;
 		using deleter_type = _Dp;
 
@@ -473,7 +533,7 @@ namespace std {
 
 		/// Default constructor, creates a friendly_unique_ptr that owns nothing.
 		template <typename _Up = _Dp,
-			typename = _DeleterConstraint<_Up>>
+			typename		   = _DeleterConstraint<_Up>>
 		constexpr friendly_unique_ptr() noexcept
 		: _M_t() {
 		}
@@ -485,7 +545,7 @@ namespace std {
        * The deleter will be value-initialized.
        */
 		template <typename _Up = _Dp,
-			typename = _DeleterConstraint<_Up>>
+			typename		   = _DeleterConstraint<_Up>>
 		explicit friendly_unique_ptr(pointer __p) noexcept
 		: _M_t(__p) {
 		}
@@ -519,7 +579,7 @@ namespace std {
 
 		/// Creates a friendly_unique_ptr that owns nothing.
 		template <typename _Up = _Dp,
-			typename = _DeleterConstraint<_Up>>
+			typename		   = _DeleterConstraint<_Up>>
 		constexpr friendly_unique_ptr(nullptr_t) noexcept
 		: friendly_unique_ptr() {
 		}
@@ -649,7 +709,7 @@ namespace std {
 		/// Release ownership of any stored pointer.
 		pointer
 		release() noexcept {
-			pointer __p = get();
+			pointer __p   = get();
 			_M_t._M_ptr() = pointer();
 			return __p;
 		}
@@ -702,14 +762,14 @@ namespace std {
 				__not_<is_same<__remove_cv<_Tp>, __remove_cv<_Up>>>>;
 
 	public:
-		using pointer = typename __uniq_ptr_impl<_Tp, _Dp>::pointer;
+		using pointer	 = typename __uniq_ptr_impl<_Tp, _Dp>::pointer;
 		using element_type = _Tp;
 		using deleter_type = _Dp;
 
 		// helper template for detecting a safe conversion from another
 		// friendly_unique_ptr
 		template <typename _Up, typename _Ep,
-			typename _Up_up = friendly_unique_ptr<_Up, _Ep>,
+			typename _Up_up		 = friendly_unique_ptr<_Up, _Ep>,
 			typename _Up_element_type = typename _Up_up::element_type>
 		using __safe_conversion_up = __and_<
 			is_array<_Up>,
@@ -735,7 +795,7 @@ namespace std {
 
 		/// Default constructor, creates a friendly_unique_ptr that owns nothing.
 		template <typename _Up = _Dp,
-			typename = _DeleterConstraint<_Up>>
+			typename		   = _DeleterConstraint<_Up>>
 		constexpr friendly_unique_ptr() noexcept
 		: _M_t() {
 		}
@@ -749,9 +809,9 @@ namespace std {
        */
 		template <typename _Up,
 			typename _Vp = _Dp,
-			typename = _DeleterConstraint<_Vp>,
-			typename = typename enable_if<
-				__safe_conversion_raw<_Up>::value, bool>::type>
+			typename	= _DeleterConstraint<_Vp>,
+			typename	= typename enable_if<
+				    __safe_conversion_raw<_Up>::value, bool>::type>
 		explicit friendly_unique_ptr(_Up __p) noexcept
 		: _M_t(__p) {
 		}
@@ -797,7 +857,7 @@ namespace std {
 
 		/// Creates a friendly_unique_ptr that owns nothing.
 		template <typename _Up = _Dp,
-			typename = _DeleterConstraint<_Up>>
+			typename		   = _DeleterConstraint<_Up>>
 		constexpr friendly_unique_ptr(nullptr_t) noexcept
 		: friendly_unique_ptr() {
 		}
@@ -892,7 +952,7 @@ namespace std {
 		/// Release ownership of any stored pointer.
 		pointer
 		release() noexcept {
-			pointer __p = get();
+			pointer __p   = get();
 			_M_t._M_ptr() = pointer();
 			return __p;
 		}

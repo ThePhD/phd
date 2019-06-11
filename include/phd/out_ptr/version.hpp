@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef PHD_OUT_PTR_VERSION_VERSION_HPP
-#define PHD_OUT_PTR_VERSION_VERSION_HPP
+#ifndef PHD_OUT_PTR_OUT_PTR_VERSION_VERSION_HPP
+#define PHD_OUT_PTR_OUT_PTR_VERSION_VERSION_HPP
 
 #include <phd/version/version.hpp>
 
@@ -19,4 +19,4 @@
 
 #endif // PHD_OUT_PTR_DEBUG, force any undefined checks to be on
 
-#endif // PHD_OUT_PTR_VERSION_VERSION_HPP
+#endif // PHD_OUT_PTR_OUT_PTR_VERSION_VERSION_HPP

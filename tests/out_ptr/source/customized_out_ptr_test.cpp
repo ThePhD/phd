@@ -9,14 +9,14 @@
 #include <iostream>
 
 namespace phd {
-	namespace out_ptr_detail {
+	namespace detail {
 		template <typename Handle, typename Pointer, typename Args>
 		struct handle_out_ptr
 		: voidpp_op<handle_out_ptr<Handle, Pointer, Args>, Pointer>,
 		  Args {
 		public:
-			using Smart = Handle;
-			using source_pointer = meta::pointer_of_or_t<Smart, Pointer>;
+			using Smart		 = Handle;
+			using source_pointer = pointer_of_or_t<Smart, Pointer>;
 
 		private:
 			Smart* m_smart_ptr;
@@ -33,9 +33,9 @@ namespace phd {
 				right.m_old_ptr == nullptr;
 			}
 			handle_out_ptr& operator=(handle_out_ptr&& right) noexcept {
-				Args::operator=(std::move(right));
-				this->m_smart_ptr = right.m_smart_ptr;
-				this->m_old_ptr = right.m_old_ptr;
+				Args::operator	=(std::move(right));
+				this->m_smart_ptr  = right.m_smart_ptr;
+				this->m_old_ptr    = right.m_old_ptr;
 				this->m_target_ptr = right.m_target_ptr;
 				right.m_old_ptr == nullptr;
 				return *this;
@@ -65,12 +65,12 @@ namespace phd {
 				static_assert(meta::always_false_index_v<I0>, "you cannot reset the deleter for handle<T, Deleter>!: it only takes one argument!");
 			}
 		};
-	} // namespace out_ptr_detail
+	} // namespace detail
 
 	template <typename T, typename D, typename Pointer, typename Args>
-	struct out_ptr_t<handle<T, D>, Pointer, Args> : out_ptr_detail::handle_out_ptr<handle<T, D>, Pointer, Args> {
+	struct out_ptr_t<handle<T, D>, Pointer, Args> : detail::handle_out_ptr<handle<T, D>, Pointer, Args> {
 	private:
-		using core_t = out_ptr_detail::handle_out_ptr<handle<T, D>, Pointer, Args>;
+		using core_t = detail::handle_out_ptr<handle<T, D>, Pointer, Args>;
 
 	public:
 		using core_t::core_t;

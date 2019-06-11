@@ -1,9 +1,0 @@
-#pragma once
-
-#ifndef PHD_OUT_PTR
-#define PHD_OUT_PTR
-
-#include <phd/out_ptr/out_ptr.hpp>
-#include <phd/version/version.hpp>
-
-#endif // PHD_OUT_PTR

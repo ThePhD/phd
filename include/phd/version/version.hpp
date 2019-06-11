@@ -21,17 +21,17 @@
 
 #endif // VC++ versus clang/g++
 
-#ifndef PHD_CTAD
+#ifndef PHD_FEATURE_CTAD
 #if defined(__cpp_deduction_guides)
-#define PHD_CTAD 1
+#define PHD_FEATURE_CTAD 1
 #elif defined(_MSC_VER) && MSC_VER >= 1914
-#define PHD_CTAD 1
+#define PHD_FEATURE_CTAD 1
 #elif defined(__GNUC__) && (__GNUC__ >= 7) && __cplusplus >= 201703L
-#define PHD_CTAD 1
+#define PHD_FEATURE_CTAD 1
 #elif defined(__clang__) && (__clang__ >= 5) && __cplusplus >= 201703L
-#define PHD_CTAD 1
+#define PHD_FEATURE_CTAD 1
 #else
-#define PHD_CTAD 0
+#define PHD_FEATURE_CTAD 0
 #endif // Detect CTAD
 #endif // Detect CTAD
 

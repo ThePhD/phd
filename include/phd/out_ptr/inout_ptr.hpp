@@ -1,10 +1,10 @@
 #pragma once
 
-#ifndef PHD_OUT_PTR_INOUT_PTR_HPP
-#define PHD_OUT_PTR_INOUT_PTR_HPP
+#ifndef PHD_OUT_PTR_OUT_PTR_INOUT_PTR_HPP
+#define PHD_OUT_PTR_OUT_PTR_INOUT_PTR_HPP
 
-#include <phd/out_ptr/clever_inout_ptr.hpp>
-#include <phd/out_ptr/simple_inout_ptr.hpp>
+#include <phd/out_ptr/detail/clever_inout_ptr.hpp>
+#include <phd/out_ptr/detail/simple_inout_ptr.hpp>
 #include <phd/version/version.hpp>
 
 namespace phd {
@@ -39,11 +39,11 @@ namespace phd {
 	template <typename Smart,
 		typename... Args>
 	auto inout_ptr(Smart& s, Args&&... args) noexcept {
-		using Pointer = meta::pointer_of_t<Smart>;
-		using P = inout_ptr_t<Smart, Pointer, Args...>;
+		using Pointer = pointer_of_t<Smart>;
+		using P	  = inout_ptr_t<Smart, Pointer, Args...>;
 		return P(s, std::forward<Args>(args)...);
 	}
 
 } // namespace phd
 
-#endif // PHD_OUT_PTR_INOUT_PTR_HPP
+#endif // PHD_OUT_PTR_OUT_PTR_INOUT_PTR_HPP
