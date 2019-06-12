@@ -1,8 +1,0 @@
-#pragma once
-
-#ifndef PHD_META_META
-#define PHD_META_META
-
-#include <phd/meta/meta.hpp>
-
-#endif // PHD_META_META

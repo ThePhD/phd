@@ -95,4 +95,7 @@
 	},
 	"C_Cpp.configurationWarnings": "Disabled",
 	"C_Cpp.intelliSenseEngineFallback": "Disabled",
+	"python.linting.pylintEnabled": false,
+	"python.linting.mypyEnabled": true,
+	"python.linting.enabled": true,
 }

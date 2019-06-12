@@ -3,7 +3,7 @@
 #define PHD_OVERLOAD_OVERLOAD_HPP
 
 #include <phd/meta/remove_cv_ref.hpp>
-#include <phd/overload/overload_detail.hpp>
+#include <phd/overload/detail/overload_detail.hpp>
 
 namespace phd {
 

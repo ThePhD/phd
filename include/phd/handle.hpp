@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef PHD_HANDLE_HANDLE
-#define PHD_HANDLE_HANDLE
+#ifndef PHD_HANDLE_HPP
+#define PHD_HANDLE_HPP
 
 #include <phd/handle/handle.hpp>
 
