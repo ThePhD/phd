@@ -45,19 +45,19 @@ target_link_libraries(phd_optional_benchmarks
 set(PHD_OPTIONAL_BENCHMARKS_REPETITIONS 250
 	CACHE STRING "The number of times to re-rerun the benchmarks to gather additional data")
 set(PHD_OPTIONAL_BENCHMARKS_FORMAT json 
-	CACHE STRING "The output format of the data. Must be json or csv")
+	CACHE STRING "The output format of the data. Must be json")
 string(TOLOWER ${PHD_OPTIONAL_BENCHMARKS_FORMAT} PHD_OPTIONAL_BENCHMARKS_FORMAT_LOWER)
 set(PHD_OPTIONAL_BENCHMARKS_FORMAT ${PHD_OPTIONAL_BENCHMARKS_FORMAT_LOWER} 
-	CACHE STRING "The output format of the data. Must be json or csv" FORCE)
+	CACHE STRING "The output format of the data. Must be json" FORCE)
 
-set(PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTDIR "${CMAKE_SOURCE_DIR}/benchmark_results/optional/")
-set(PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE "${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTDIR}/optional_benchmarks.${PHD_OPTIONAL_BENCHMARKS_FORMAT}")
+set(PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTDIR "${CMAKE_SOURCE_DIR}/benchmark_results/optional")
+set(PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE "${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTDIR}/optional_benchmarks_data.${PHD_OPTIONAL_BENCHMARKS_FORMAT}")
 file(MAKE_DIRECTORY "${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTDIR}")
 
 set(phd_optional_benchmarks_categories 
 	int_3x_by,int_by,vector_by,vector_3x_by)
 set(phd_optional_benchmarks_category_names 
-	"int 3x,int 1x,vector 1x,vector 3x")
+	"int 3x" "int 1x" "vector 1x" "vector 3x")
 
 add_custom_target(phd_optional_benchmarks_runner
 	COMMAND phd_optional_benchmarks 
@@ -69,14 +69,15 @@ add_custom_target(phd_optional_benchmarks_runner
 	COMMENT "Executing Benchmarks and outputting to '${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE}'"
 )
 
-if (PYTHONINTERP_FOUND)
+if (Python3_Interpreter_FOUND)
 	add_custom_target(phd_optional_benchmarks_graphs_generator
-		COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/benchmarks/tools/generate_graphs.py" 
+		COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/benchmarks/tools/generate_graphs.py" 
 			"--input=${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE}"
 			"--input_format=${PHD_OPTIONAL_BENCHMARKS_FORMAT}"
 			"--output_dir=${PHD_OPTIONAL_BENCHMARKS_GRAPH_OUTDIR}"
 			"--categories=${phd_optional_benchmarks_categories}"
-			"--category_names=${phd_optional_benchmarks_category_names}"
+			--category_names ${phd_optional_benchmarks_category_names}
+		DEPENDS phd_optional_benchmarks "${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE}"
 		COMMENT "Graphing '${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE}' data to '${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTDIR}'"
 	)
 endif()

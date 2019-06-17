@@ -27,7 +27,7 @@ inline namespace __abi_v0 {
 		overlong_sequence = 0x03,
 		// output cannot receive all the completed code units
 		insufficient_output_space = 0x04,
-		// sequence can be encoded but resuulting code point is invalid (e.g., encodes a lone surrogate)
+		// sequence can be encoded but resulting code point is invalid (e.g., encodes a lone surrogate)
 		invalid_output = 0x05,
 		// leading code unit is wrong
 		invalid_leading_sequence = 0x06,

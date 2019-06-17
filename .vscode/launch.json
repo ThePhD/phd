@@ -24,6 +24,23 @@
 			]
 		},
 		{
+			"name": "optional graph generation",
+			"type": "python",
+			"request": "launch",
+			"program": "${workspaceFolder}/benchmarks/tools/generate_graphs.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--input=benchmark_results/optional/optional_benchmarks.json",
+				"--input_format=json",
+				"--output_dir=benchmark_results/optional/",
+				"--categories",
+				"int 3x",
+				"int 1x",
+				"vector 1x",
+				"vector 3x"
+			]
+		},
+		{
 			"name": "(Windows) Launch",
 			"type": "cppvsdbg",
 			"request": "launch",

@@ -22,7 +22,7 @@
 namespace phd {
 	inline namespace __abi_v0 {
 	namespace __text_detail {
-		template <typename __Derived = void, typename __CodeUnit = char8_t, bool __overlong_allowed = false, bool __surrogates_allowed = false, bool __no_nulls = false>
+		template <typename __Derived = void, typename __CodeUnit = char8_t, bool __overlong_allowed = false, bool __surrogates_allowed = false, bool __use_overlong_null_only = false>
 		struct __utf8_with {
 		private:
 			using __self_t = typename std::conditional<std::is_void_v<__Derived>, __utf8_with, __Derived>::type;
@@ -67,7 +67,7 @@ namespace phd {
 					}
 				}
 
-				if constexpr (__no_nulls) {
+				if constexpr (__use_overlong_null_only) {
 					if (__codepoint == 0) {
 						// overlong MUTF-8
 						constexpr char8_t payload[] = {

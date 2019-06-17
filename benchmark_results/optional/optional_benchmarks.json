@@ -1,0 +1,94 @@
+{
+	"time_scales": {
+		"example_time": "clock",
+		"real_time": [
+			{
+				"abbreviation": "fs",
+				"name": "femtoseconds",
+				"from": 1e+15
+			},
+			{
+				"abbreviation": "ps",
+				"name": "picoseconds",
+				"from": 1e+12
+			},
+			{
+				"abbreviation": "ns",
+				"name": "nanoseconds",
+				"from": 1e+9
+			},
+			{
+				"abbreviation": "µs",
+				"name": "microseconds",
+				"from": 1000000
+			},
+			{
+				"abbreviation": "ms",
+				"name": "milliseconds",
+				"from": 1000
+			},
+			{
+				"abbreviation": "s",
+				"name": "seconds",
+				"from": 1,
+				"to": 1
+			},
+			{
+				"abbreviation": "m",
+				"name": "minutes",
+				"from": 0.166666666666666,
+				"to": 60
+			},
+			{
+				"abbreviation": "h",
+				"name": "hours",
+				"from": 2.777778e-4,
+				"to": 360
+			}
+		]
+	},
+	"inputs": [
+		{
+			"prefix": "",
+			"file": "optional_benchmarks.json"
+		}
+	],
+	"category_defaults": {
+		"no_op": true,
+		"scale": 1,
+		"data_point_names": [
+			{
+				"title": "real time",
+				"scale": "clock",
+				"match": "real_time"
+			}
+		],
+		"priority": "lower"
+	},
+	"categories": {
+		"int 1x": {
+			"title": "int 1x",
+			"matches": [
+				"int_by_"
+			]
+		},
+		"int 3x": {
+			"title": "int 3x",
+			"matches": [
+				"int_3x_by_"
+			]
+		},
+		"vector 1x": {
+			"title": "vector 1x",
+			"matches": [
+				"vector_by_"
+			]
+		},
+		"vector 3x": {
+			"title": "vector 3x",
+			"matches": [
+				"vector_3x_by_"
+			]
+		}
+	}
+}

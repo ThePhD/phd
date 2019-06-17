@@ -1,3 +1,4 @@
+from typing import List, Set, Dict, Tuple, Optional
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -17,6 +18,10 @@ def len_sorter(x):
 	return len(x)
 
 
+def time_scale_to_base_sorter(x):
+	return x.to_base
+
+
 def entry_name_sorter(b):
 	return b["name"]
 
@@ -25,6 +30,59 @@ def is_noop_category(n):
 	noop_names = ["noop", "no-op", "no op"]
 	s = n.casefold()
 	return s in noop_names
+
+
+class time_unit:
+	def __init__(self,
+	             name_=None,
+	             abbreviation_=None,
+	             from_base_=None,
+	             to_base_=None):
+		self.abbreviation = name_ or "s"
+		self.name = abbreviation_ or "seconds"
+		self.from_base = from_base_ or 1
+		self.to_base = to_base_ or 1
+
+
+class time_scale:
+	def __init__(self, name_: str = None, scales_: List[time_unit] = None):
+		if name_ is None:
+			name_ = "real_time"
+		self.name: str = name_
+		if scales_ is None:
+			scales_ = [
+			    time_unit("femtoseconds", "fs", 1e+15, 1e-15),
+			    time_unit("picoseconds", "ps", 1e+12, 1e-12),
+			    time_unit("nanoseconds", "ns", 1e+9, 1e-9),
+			    time_unit("microseconds", "µs", 1000000, 1 / 1000000),
+			    time_unit("milliseconds", "ms", 1000, 1 / 1000),
+			    time_unit("seconds", "s", 1, 1),
+			    time_unit("minutes", "m", 1 / 60, 60),
+			    time_unit("hours", "h", 1 / (60 * 60), 60 * 60)
+			]
+		self.scales: List[time_unit] = scales_
+		self.scales.sort(key=time_scale_to_base_sorter)
+
+
+class data_point_name:
+	def __init__(self, title_=None, scale_=None, match_=None):
+		if title_ is None:
+			title_ = "real time"
+		if scale_ is None:
+			scale_ = time_scale()
+		if match_ is None:
+			match_ = "real_time"
+		self.title = title_
+		self.scale = scale_
+		self.match = match_
+
+
+class benchmark_category():
+	def __init__(self):
+		self.no_op = True
+		self.scale = 1
+		self.data_point_names = [data_point_name()]
+		self.match = None
 
 
 def aggregate_categories(all_benchmarks, data_point_names):
@@ -96,13 +154,6 @@ def aggregate_categories(all_benchmarks, data_point_names):
 		entries.sort(key=mean_sorter, reverse=lower_is_better)
 
 	return benchmarks
-
-
-def parse_csv(c, data_point_names, name_removals, categories, scale,
-              scale_categories, time_scales):
-	all_benchmarks = []
-
-	return aggregate_categories(all_benchmarks, data_point_names)
 
 
 def parse_json(j, data_point_names, name_removals, categories, scale,
@@ -260,7 +311,8 @@ def draw_graph(name, category, benchmarks_heuristics, data_point_names,
 			err = benchmark.get('error')
 
 			color_index = benchmark["color_index"][data_point_name]
-			aesthetics = data_point_aesthetics[color_index]
+			aesthetics = data_point_aesthetics[color_index %
+			                                   len(data_point_aesthetics)]
 			color = aesthetics[0]
 			colorhsv = matplotlib.colors.rgb_to_hsv(
 			    matplotlib.colors.hex2color(color))
@@ -269,36 +321,34 @@ def draw_graph(name, category, benchmarks_heuristics, data_point_names,
 
 			if err != None:
 				bars.append(
-				    axes.text(
-				        absolute_range * 0.02,
-				        bar_y + (quarter_bar_height * 2),
-				        err,
-				        color=color,
-				        style='italic',
-				        horizontalalignment='left',
-				        verticalalignment='center',
-				        fontsize='small'))
+				    axes.text(absolute_range * 0.02,
+				              bar_y + (quarter_bar_height * 2),
+				              err,
+				              color=color,
+				              style='italic',
+				              horizontalalignment='left',
+				              verticalalignment='center',
+				              fontsize='small'))
 				continue
 
 			mean = statistics["mean"][data_point_name]
 			stddev = statistics["stddev"][data_point_name]
 			hatch = aesthetics[1]
-			bar = axes.barh(
-			    bar_y,
-			    mean,
-			    height=bar_height,
-			    xerr=stddev,
-			    linewidth=0.2,
-			    edgecolor=edgecolor,
-			    color=color,
-			    hatch=hatch,
-			    align='edge',
-			    error_kw={
-			        "capsize": 5.0,
-			        "mew": 1.2,
-			        "ecolor": 'black',
-			    },
-			    alpha=0.82)
+			bar = axes.barh(bar_y,
+			                mean,
+			                height=bar_height,
+			                xerr=stddev,
+			                linewidth=0.2,
+			                edgecolor=edgecolor,
+			                color=color,
+			                hatch=hatch,
+			                align='edge',
+			                error_kw={
+			                    "capsize": 5.0,
+			                    "mew": 1.2,
+			                    "ecolor": 'black',
+			                },
+			                alpha=0.82)
 			bars.append(bar)
 			# the scatter plot should be semi-transparent in color...
 			xscatter = benchmark["data"][data_point_name]
@@ -309,13 +359,12 @@ def draw_graph(name, category, benchmarks_heuristics, data_point_names,
 			    for _ in xscatter
 			]
 			scatter_alpha = 0.20 if xscatter_len < 11 else 0.10 if xscatter_len < 101 else 0.05 if xscatter_len < 1001 else 0.002
-			scatter = axes.scatter(
-			    xscatter,
-			    yscatter,
-			    color=color,
-			    edgecolor='#000000',
-			    linewidth=0.5,
-			    alpha=scatter_alpha)
+			scatter = axes.scatter(xscatter,
+			                       yscatter,
+			                       color=color,
+			                       edgecolor='#000000',
+			                       linewidth=0.5,
+			                       alpha=scatter_alpha)
 			scatters.append(scatter)
 
 	xscaleindex = bisect.bisect_left(time_scale_values_from_seconds,
@@ -388,17 +437,18 @@ def main():
 	    description=
 	    'Generate graphs from a Google-Benchmark compatible json/csv listing of data'
 	)
-	parser.add_argument(
-	    '-i',
-	    '--input',
-	    nargs='?',
-	    default='out_ptr_benchmarks.json',
-	    type=argparse.FileType('r'))
+	parser.add_argument('-i',
+	                    '--input',
+	                    nargs='?',
+	                    default='out_ptr_benchmarks.json',
+	                    type=argparse.FileType('r'))
 	parser.add_argument('-f', '--input_format', nargs='?')
 	parser.add_argument('-o', '--output', nargs='?')
 	parser.add_argument('-d', '--output_dir', nargs='?')
-	parser.add_argument(
-	    '-p', '--data_point_names', nargs='+', default=['real_time'])
+	parser.add_argument('-p',
+	                    '--data_point_names',
+	                    nargs='+',
+	                    default=['real_time'])
 	parser.add_argument('-l', '--lower', nargs='+', default=['real_time'])
 	parser.add_argument('-c', '--categories', nargs='+', default=[])
 	parser.add_argument('-s', '--scale', nargs='?', type=int, default=1)
@@ -421,9 +471,8 @@ def main():
 		args.output_dir = directoryname
 
 	if len(args.data_point_names) < 1:
-		print(
-		    "You must specify 1 or more valid data point names",
-		    file=sys.stderr)
+		print("You must specify 1 or more valid data point names",
+		      file=sys.stderr)
 		sys.exit(1)
 
 	data_point_names = [(dpn, dpn in args.lower)
@@ -435,17 +484,7 @@ def main():
 	name = os.path.split(args.input.name)[1]
 	name = os.path.splitext(name)[0]
 
-	clock_time_scales = [
-	    ("fs", "femtoseconds", 1e-15, 1e+15),
-	    ("ps", "picoseconds", 1e-12, 1e+12),
-	    ("ns", "nanoseconds", 1e-9, 1e+9),
-	    ("µs", "microseconds", .00001, 1000000),
-	    ("us", "microseconds", .00001, 1000000),
-	    ("ms", "milliseconds", .001, 1000),
-	    ("s", "seconds", 1, 1),
-	    ("m", "minutes", 60, 1 / 60),
-	    ("h", "hours", 60 * 60, (1 / 60) / 60),
-	]
+	time_scales: Dict[str, time_scale] = {"clock": time_scale()}
 
 	clock_time_scales = [
 	    ("fs", "femtoseconds", 1e-15, 1e+15),
@@ -459,27 +498,16 @@ def main():
 	    ("h", "hours", 60 * 60, (1 / 60) / 60),
 	]
 
-	is_csv = args.input_format == "csv"
 	is_json = args.input_format == "json"
-	if (not is_csv and not is_json):
-		print(
-		    "You must specify either 'json' or 'csv' as the format.",
-		    file=sys.stderr)
+	if (not is_json):
+		print("You must specify 'json' as the format.", file=sys.stderr)
 		sys.exit(1)
 
 	benchmarks = None
-	if is_csv:
-		c = csv.reader(args.input)
-		benchmarks = parse_csv(c, data_point_names, name_removals,
-		                       args.categories, args.scale,
-		                       args.scale_categories, clock_time_scales)
-	elif is_json:
-		j = json.load(args.input)
-		benchmarks = parse_json(j, data_point_names, name_removals,
-		                        args.categories, args.scale,
-		                        args.scale_categories, clock_time_scales)
-	else:
-		return
+	j = json.load(args.input)
+	benchmarks = parse_json(j, data_point_names, name_removals,
+	                        args.categories, args.scale,
+	                        args.scale_categories, clock_time_scales)
 
 	# we are okay to draw
 	# draw for each category
