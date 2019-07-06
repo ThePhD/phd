@@ -1,8 +1,9 @@
+
+
 #include <phd/out_ptr/out_ptr.hpp>
 
 #include <catch2/catch.hpp>
 
-#include <iostream>
 #include <atomic>
 #include <mutex>
 #include <thread>
@@ -21,8 +22,8 @@
 #include <unistd.h>
 #include <assert.h>
 
-auto fopen_s(FILE** f, const char* name, const char* mode) {
-	auto ret = 0;
+int fopen_s(FILE** f, const char* name, const char* mode) {
+	int ret = 0;
 	assert(f);
 	*f = fopen(name, mode);
 	/* Can't be sure about 1-to-1 mapping of errno and MS' errno_t */
@@ -201,7 +202,7 @@ TEST_CASE("out_ptr/fd_with_custom_pointer", "out_ptr type works with smart point
 
 	SECTION("without_file") {
 		std::unique_ptr<int, fd_deleter> my_unique_fd;
-		auto err = fopen_s(phd::out_ptr<FILE*>(my_unique_fd), "nonexistent.blah.io", "rb");
+		auto err = fopen_s(boost::out_ptr::out_ptr<FILE*>(my_unique_fd), "nonexistent.blah.io", "rb");
 		REQUIRE(err != 0);
 		REQUIRE(my_unique_fd.get() == nullptr);
 	}

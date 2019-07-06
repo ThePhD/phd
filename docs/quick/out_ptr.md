@@ -2,7 +2,7 @@
 
 ᴮᵉᶜᵃᵘˢᵉ ˢᵒᵐᵉᵇᵒᵈʸ ᵗᵒᶫᵈ ᵐᵉ ᶦᵗ ᵐᶦᵍʰᵗ ᵇᵉ ᶠᵃˢᵗᵉʳ ᵗʰᵃᶰ ᵗʰᵉ ʳᵉᵍᵘᶫᵃʳ ᶦᵐᵖᶫᵉᵐᵉᶰᵗᵃᵗᶦᵒᶰ ˢᵒ ᶦᵗˢ ᵗᶦᵐᵉ ᵗᵒ ʰᵒᵖ ᵒᶰ ᵗʰᵃᵗ ᵖᵉʳᶠᵒʳᵐᵃᶰᶜᵉ ᵇᵘˢ 🚌 ᵇᵉᵉᵖ ᵇᵉᵉᵉᵉᵉᵖ⋅
 
-This library is for allowing a person to use a C-style out-pointer API with pointers such as `std::unique_ptr`, `std::shared_ptr`, `boost::shared_ptr` and the upcoming [`std::retain_ptr`](https://wg21.link/p0468). It is meant to simplify the handling of these resources with these APIs and make it easier to handle these cases.
+This library is for allowing a person to use a C-style out-pointer API with pointers such as `std::unique_ptr`, `std::shared_ptr`, `phd::shared_ptr` and the upcoming [`std::retain_ptr`](https://wg21.link/p0468). It is meant to simplify the handling of these resources with these APIs and make it easier to handle these cases.
 
 It is also for testing whether or not an abstraction like this can be as fast as the hand-written C-code that stuffs raw-pointer out results back into their C++ counterparts after performing a `release` call or a `release`/`reset` call pair.
 

@@ -1,11 +1,14 @@
+
+
 #pragma once
 
-#ifndef PHD_OUT_PTR_OUT_PTR_DETAIL_BASE_OUT_PTR_IMPL_HPP
-#define PHD_OUT_PTR_OUT_PTR_DETAIL_BASE_OUT_PTR_IMPL_HPP
+#ifndef PHD_OUT_PTR_DETAIL_BASE_OUT_PTR_IMPL_HPP
+#define PHD_OUT_PTR_DETAIL_BASE_OUT_PTR_IMPL_HPP
 
-#include <phd/meta/is_specialization_of.hpp>
 #include <phd/out_ptr/pointer_of.hpp>
-#include <phd/out_ptr/detail/voidpp_op.hpp>
+#include <phd/out_ptr/detail/is_specialization_of.hpp>
+#include <phd/out_ptr/detail/customization_forward.hpp>
+#include <phd/out_ptr/detail/inout_ptr_traits.hpp>
 
 #include <cstdlib>
 #include <type_traits>
@@ -13,82 +16,71 @@
 #include <utility>
 #include <tuple>
 
-namespace phd::detail {
+// Only defined for clang version 7 and above
+#if defined(__clang__) && __clang__ >= 7
+#define PHD_OUT_PTR_TRIVIAL_ABI __attribute__((trivial_abi))
+#else
+#define PHD_OUT_PTR_TRIVIAL_ABI
+#endif // Clang or otherwise
 
-	template <typename Smart, typename... Args>
-	void reset_or_create(std::true_type, Smart& s, Args&&... args) {
-		s.reset(std::forward<Args>(args)...);
-	}
+namespace phd {
+namespace out_ptr {
+namespace detail {
 
-	template <typename Smart, typename... Args>
-	void reset_or_create(std::false_type, Smart& s, Args&&... args) {
-		s = Smart(std::forward<Args>(args)...);
-	}
+	template <typename Smart, typename Pointer, typename Traits, typename Args, typename List>
+	class PHD_OUT_PTR_TRIVIAL_ABI base_out_ptr_impl;
 
-	template <typename Smart, typename Pointer, typename Args, typename List>
-	struct base_out_ptr_impl;
-
-	template <typename Smart, typename Pointer, typename Args, std::size_t... Indices>
-	struct base_out_ptr_impl<Smart, Pointer, Args, std::index_sequence<Indices...>>
-	: voidpp_op<base_out_ptr_impl<Smart, Pointer, Args, std::index_sequence<Indices...>>, Pointer>,
-	  Args {
+	template <typename Smart, typename Pointer, typename Traits, typename Base, std::size_t... Indices>
+	class PHD_OUT_PTR_TRIVIAL_ABI base_out_ptr_impl<Smart, Pointer, Traits, Base, std::index_sequence<Indices...>>
+	: protected Base {
 	protected:
-		using source_pointer = pointer_of_or_t<Smart, Pointer>;
-		using can_reset	 = is_resetable<Smart,
-			decltype(static_cast<source_pointer>(nullptr)),
-			decltype(std::get<Indices>(std::declval<Args&&>()))...>;
-
+		using traits_t = Traits;
+		using storage  = pointer_of_or_t<traits_t, Pointer>;
 		Smart* m_smart_ptr;
-		Pointer m_target_ptr;
+		storage m_target_ptr;
 
-		static_assert(!meta::is_specialization_of_v<Smart, std::shared_ptr> || (sizeof...(Indices) > 0),
+		static_assert(!(is_specialization_of<Smart, std::shared_ptr>::value || is_specialization_of<Smart, ::boost::shared_ptr>::value)
+				|| (sizeof...(Indices) > 0), // clang-format hack
 			"shared_ptr<T> must pass a deleter in alongside the out_ptr "
 			"so when reset is called the deleter can be properly "
 			"initialized, otherwise the deleter will be defaulted "
 			"by the shared_ptr<T>::reset() call!");
 
-		base_out_ptr_impl(Smart& ptr, Args&& args, Pointer initial) noexcept
-		: Args(std::move(args)), m_smart_ptr(std::addressof(ptr)), m_target_ptr(initial) {
-		}
-
-		base_out_ptr_impl(Smart& ptr, Args&& args, meta::meta_detail::disambiguate_) noexcept
-		: Args(std::move(args)), m_smart_ptr(std::addressof(ptr)), m_target_ptr() {
+		base_out_ptr_impl(Smart& ptr, Base&& args, storage initial) noexcept
+		: Base(std::move(args)), m_smart_ptr(std::addressof(ptr)), m_target_ptr(initial) {
 		}
 
 	public:
-		base_out_ptr_impl(Smart& ptr, Args&& args) noexcept
-		: base_out_ptr_impl(ptr, std::move(args), meta::meta_detail::disambiguate_()) {
+		base_out_ptr_impl(Smart& ptr, Base&& args) noexcept
+		: Base(std::move(args)), m_smart_ptr(std::addressof(ptr)), m_target_ptr(traits_t::construct(ptr, std::get<Indices>(static_cast<Base&>(*this))...)) {
 		}
 
 		base_out_ptr_impl(base_out_ptr_impl&& right) noexcept
-		: Args(std::move(*this)), m_smart_ptr(right.m_smart_ptr), m_target_ptr(right.m_target_ptr) {
+		: Base(std::move(right)), m_smart_ptr(right.m_smart_ptr), m_target_ptr(std::move(right.m_target_ptr)) {
 			right.m_smart_ptr = nullptr;
 		}
 		base_out_ptr_impl& operator=(base_out_ptr_impl&& right) noexcept {
-			static_cast<Args&>(*this) = std::move(right);
-			this->m_smart_ptr		 = right.m_smart_ptr;
-			this->m_target_ptr		 = right.m_target_ptr;
+			static_cast<Base&>(*this) = std::move(right);
+			this->m_smart_ptr		 = std::move(right.m_smart_ptr);
+			this->m_target_ptr		 = std::move(right.m_target_ptr);
 			right.m_smart_ptr		 = nullptr;
 			return *this;
 		}
-		base_out_ptr_impl(const base_out_ptr_impl&) noexcept = delete;
-		base_out_ptr_impl& operator=(const base_out_ptr_impl&) noexcept = delete;
 
-		operator Pointer*() noexcept {
-			return std::addressof(this->m_target_ptr);
-		}
-		operator Pointer&() noexcept {
-			return this->m_target_ptr;
+		operator Pointer*() const noexcept {
+			using has_get_call = std::integral_constant<bool, has_traits_get_call<traits_t>::value>;
+			return call_traits_get<traits_t>(has_get_call(), *const_cast<Smart*>(this->m_smart_ptr), const_cast<storage&>(this->m_target_ptr));
 		}
 
-		~base_out_ptr_impl() noexcept(noexcept(reset_or_create(can_reset(), std::declval<Smart&>(), std::declval<source_pointer>(), std::get<Indices>(std::declval<Args&&>())...))) {
-			if (m_smart_ptr) {
-				Args&& args = std::move(static_cast<Args&>(*this));
-				// lmao "if constexpr" xD
-				reset_or_create(can_reset(), *this->m_smart_ptr, static_cast<source_pointer>(this->m_target_ptr), std::get<Indices>(std::move(args))...);
+		~base_out_ptr_impl() noexcept(noexcept(traits_t::reset(std::declval<Smart&>(), std::declval<storage&>(), std::get<Indices>(std::move(std::declval<Base&>()))...))) {
+			if (this->m_smart_ptr) {
+				Base&& args = std::move(static_cast<Base&>(*this));
+				(void)args; // unused if "Indices" is empty
+				traits_t::reset(*this->m_smart_ptr, this->m_target_ptr, std::get<Indices>(std::move(args))...);
 			}
 		}
 	};
-} // namespace phd::detail
 
-#endif // PHD_OUT_PTR_OUT_PTR_DETAIL_BASE_OUT_PTR_IMPL_HPP
+}}} // namespace phd::out_ptr::detail
+
+#endif // PHD_OUT_PTR_DETAIL_BASE_OUT_PTR_IMPL_HPP

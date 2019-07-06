@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef PHD_TESTS_C_API_HPP
-#define PHD_TESTS_C_API_HPP
+#ifndef PHD_OUT_PTR_TESTS_C_API_HPP
+#define PHD_OUT_PTR_TESTS_C_API_HPP
 
 struct base1 {
 	virtual ~base1() {
@@ -25,4 +25,4 @@ inline int init_derived2(derived2** pp_derived, bool please_fail = false) {
 	return 0;
 }
 
-#endif // PHD_TESTS_C_API_HPP
+#endif // PHD_OUT_PTR_TESTS_C_API_HPP
