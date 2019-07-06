@@ -1,5 +1,5 @@
 # Dependencies
-add_subdirectory(../vendor/Catch2 "vendor/Catch2")
+add_subdirectory(../vendor/catch2 "vendor/Catch2")
 
 # Tests
 add_subdirectory(out_ptr)
