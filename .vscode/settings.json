@@ -98,4 +98,5 @@
 	"python.linting.pylintEnabled": false,
 	"python.linting.mypyEnabled": true,
 	"python.linting.enabled": true,
+	"C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
 }

@@ -1,11 +1,3 @@
-//  Copyright ⓒ 2018-2019 ThePhD.
-//
-//  Distributed under the Boost Software License, Version 1.0. (See
-//  accompanying file LICENSE or copy at
-//  http://www.phd.org/LICENSE_1_0.txt)
-//
-//  See http://www.phd.org/libs/out_ptr/ for documentation.
-
 #pragma once
 
 #ifndef PHD_OUT_PTR_FRIENDLY_UNIQUE_PTR_HPP
@@ -248,7 +240,7 @@ namespace std {
 		};
 
 #ifndef _LIBCPP_CXX03_LANG
-		typedef __friendly_unique_ptr_deleter_sfinae<_Dp> _DeleterSFINAE;
+		typedef __unique_ptr_deleter_sfinae<_Dp> _DeleterSFINAE;
 
 		template <bool _Dummy>
 		using _LValRefType =

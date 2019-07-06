@@ -48,6 +48,7 @@ target_link_libraries(phd.out_ptr.tests
 	PRIVATE 
 	phd::phd
 	ficapi::ficapi	
+	Catch2::Catch2
 	${CMAKE_DL_LIBS}
 )
 add_test(NAME phd.out_ptr.tests COMMAND phd.out_ptr.tests)

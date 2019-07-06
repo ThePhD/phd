@@ -20,12 +20,12 @@ namespace phd { namespace out_ptr {
 	// this is the full out_ptr_t customization point
 	// you can also specialize the inout_ptr_t for that template too
 	template <typename T, typename D, typename Pointer, typename... Args>
-	class inout_ptr_t<phd::handle<T, D>, Pointer, Args...> : boost::empty_value<std::tuple<Args...>> {
+	class inout_ptr_t<phd::handle<T, D>, Pointer, Args...> : phd::base::ebco<std::tuple<Args...>> {
 	private:
 		using Smart		 = phd::handle<T, D>;
 		using source_pointer = pointer_of_or_t<Smart, Pointer>;
 		using ArgsTuple	 = std::tuple<Args...>;
-		using Base		 = boost::empty_value<ArgsTuple>;
+		using Base		 = phd::base::ebco<ArgsTuple>;
 
 		Pointer* m_target_ptr;
 
@@ -67,7 +67,7 @@ namespace phd { namespace out_ptr {
 
 int main() {
 	phd::handle<int*, ficapi::int_deleter> p(nullptr);
-	ficapi_re_create(boost::out_ptr::inout_ptr<void*>(p), ficapi_type::ficapi_type_int);
+	ficapi_re_create(phd::out_ptr::inout_ptr<void*>(p), ficapi_type::ficapi_type_int);
 	int* rawp = static_cast<int*>(p.get());
 
 	OUT_PTR_C_ASSERT(rawp != nullptr);

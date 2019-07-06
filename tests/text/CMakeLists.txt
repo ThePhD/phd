@@ -7,6 +7,8 @@ set(phd.text.test_sources
 	"source/encoding.cpp"
 	"source/text.cpp"
 	"source/text_view.cpp"
+
+	"source/main.cpp"
 )
 
 add_executable(phd.text.test ${phd.text.test_sources})
@@ -21,6 +23,9 @@ target_include_directories(phd.text.test
 	PRIVATE 
 	"${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(phd.text.test 
-	PRIVATE phd::phd ${CMAKE_DL_LIBS}
+	PRIVATE 
+	phd::phd 	
+	Catch2::Catch2
+	${CMAKE_DL_LIBS}
 )
 add_test(NAME phd.text.test COMMAND phd.text.test)

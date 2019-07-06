@@ -9,6 +9,7 @@
 #include <phd/out_ptr/detail/is_specialization_of.hpp>
 #include <phd/out_ptr/detail/customization_forward.hpp>
 #include <phd/out_ptr/detail/inout_ptr_traits.hpp>
+#include <phd/out_ptr/detail/voidpp_op.hpp>
 
 #include <cstdlib>
 #include <type_traits>
@@ -32,7 +33,7 @@ namespace detail {
 
 	template <typename Smart, typename Pointer, typename Traits, typename Base, std::size_t... Indices>
 	class PHD_OUT_PTR_TRIVIAL_ABI base_out_ptr_impl<Smart, Pointer, Traits, Base, std::index_sequence<Indices...>>
-	: protected Base {
+	: public voidpp_op<base_out_ptr_impl<Smart, Pointer, Traits, Base, std::index_sequence<Indices...>>, Pointer>, protected Base {
 	protected:
 		using traits_t = Traits;
 		using storage  = pointer_of_or_t<traits_t, Pointer>;

@@ -16,6 +16,9 @@ target_include_directories(phd.handle.test
 	PRIVATE 
 	"${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(phd.handle.test 
-	PRIVATE phd::phd ${CMAKE_DL_LIBS}
+	PRIVATE 
+	phd::phd	
+	Catch2::Catch2 
+	${CMAKE_DL_LIBS}
 )
 add_test(NAME phd.handle.test COMMAND phd.handle.test)

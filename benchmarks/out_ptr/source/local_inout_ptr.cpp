@@ -56,7 +56,7 @@ static void simple_local_inout_ptr(benchmark::State& state) {
 	int64_t x = 0;
 	for (auto _ : state) {
 		std::unique_ptr<ficapi::opaque, ficapi::handle_no_alloc_deleter> p(nullptr);
-		ficapi_handle_no_alloc_re_create(phd::detail::simple_inout_ptr(p));
+		ficapi_handle_no_alloc_re_create(phd::out_ptr::detail::simple_inout_ptr(p));
 		x += ficapi_handle_get_data(p.get());
 	}
 	int64_t expected = int64_t(state.iterations()) * ficapi_get_data();
@@ -75,7 +75,7 @@ static void clever_local_inout_ptr(benchmark::State& state) {
 	int64_t x = 0;
 	for (auto _ : state) {
 		std::unique_ptr<ficapi::opaque, ficapi::handle_no_alloc_deleter> p(nullptr);
-		ficapi_handle_no_alloc_re_create(phd::detail::clever_inout_ptr(p));
+		ficapi_handle_no_alloc_re_create(phd::out_ptr::detail::clever_inout_ptr(p));
 		x += ficapi_handle_get_data(p.get());
 	}
 	int64_t expected = int64_t(state.iterations()) * ficapi_get_data();
@@ -96,7 +96,7 @@ static void friendly_local_inout_ptr(benchmark::State& state) {
 	int64_t x = 0;
 	for (auto _ : state) {
 		std::friendly_unique_ptr<ficapi::opaque, ficapi::handle_no_alloc_deleter> p(nullptr);
-		ficapi_handle_no_alloc_re_create(phd::friendly_inout_ptr(p));
+		ficapi_handle_no_alloc_re_create(phd::out_ptr::detail::friendly_inout_ptr(p));
 		x += ficapi_handle_get_data(p.get());
 	}
 	int64_t expected = int64_t(state.iterations()) * ficapi_get_data();

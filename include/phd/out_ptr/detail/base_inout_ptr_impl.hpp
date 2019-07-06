@@ -17,7 +17,7 @@ namespace out_ptr {
 namespace detail {
 
 	template <typename Smart, typename Pointer, typename Args, typename List>
-	struct base_inout_ptr_impl : base_out_ptr_impl<Smart, Pointer, inout_ptr_traits<Smart, Pointer>, Args, List> {
+	class base_inout_ptr_impl : public base_out_ptr_impl<Smart, Pointer, inout_ptr_traits<Smart, Pointer>, Args, List> {
 	private:
 		using base_t = base_out_ptr_impl<Smart, Pointer, inout_ptr_traits<Smart, Pointer>, Args, List>;
 

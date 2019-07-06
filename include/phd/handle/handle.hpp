@@ -71,7 +71,7 @@ namespace phd {
 		}
 
 		template <typename D, typename P>
-		void write_null(std::false_type, D& deleter, P&& p) noexcept {
+		void write_null(std::false_type, D&, P&& p) noexcept {
 			default_handle_deleter<std::remove_const_t<std::remove_reference_t<P>>>::write_null(std::forward<P>(p));
 		}
 
@@ -87,7 +87,7 @@ namespace phd {
 		}
 
 		template <typename D, typename P>
-		bool is_null(std::false_type, D& deleter, P&& p) noexcept {
+		bool is_null(std::false_type, D&, P&& p) noexcept {
 			return default_handle_deleter<std::remove_const_t<std::remove_reference_t<P>>>::is_null(std::forward<P>(p));
 		}
 
@@ -153,9 +153,9 @@ namespace phd {
 		}
 
 		handle& operator=(const handle&) noexcept = delete;
-		handle& operator=(handle&& right) noexcept {
-			this->reset(right.release());
-			return *this;
+		handle& operator					  =(handle&& right) noexcept {
+			 this->reset(right.release());
+			 return *this;
 		}
 		handle& operator=(pointer right) noexcept {
 			this->reset(right);
@@ -173,7 +173,7 @@ namespace phd {
 		pointer get_null() const noexcept {
 			pointer p;
 			const deleter_type& deleter = this->get_deleter();
-			deleter.write_null(p);
+			detail::write_null(deleter, p);
 			return p;
 		}
 
@@ -205,7 +205,7 @@ namespace phd {
 		}
 
 		pointer release() noexcept {
-			pointer rel = std::move(res);
+			pointer rel		  = std::move(res);
 			deleter_type& deleter = this->get_deleter();
 			detail::write_null(deleter, res);
 			return rel;

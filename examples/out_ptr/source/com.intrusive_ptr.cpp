@@ -26,7 +26,7 @@ void COM_folder_check() {
 	// not AddRef when putting
 	// the output parameter into the intrusive_ptr
 	HRESULT cci_result = CoCreateInstance(clsid, 0, CLSCTX_INPROC_SERVER,
-		__uuidof(IDispatch), boost::out_ptr::out_ptr<void*>(dispatch_ptr, false));
+		__uuidof(IDispatch), phd::out_ptr::out_ptr<void*>(dispatch_ptr, false));
 	if (FAILED(cci_result)) {
 		throw std::runtime_error("failed to create IDispatch Instance");
 	}

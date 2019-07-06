@@ -34,7 +34,7 @@ int main() {
 	// Grab the result returned by the pthread through its `void*`
 	// and put it into the shared pointer
 	std::unique_ptr<int> result(nullptr);
-	auto err = pthread_join(compute_thread, boost::out_ptr::out_ptr<void*>(result));
+	auto err = pthread_join(compute_thread, phd::out_ptr::out_ptr<void*>(result));
 	if (err) {
 		std::cerr << "Error joining thread" << std::endl;
 		return 2;

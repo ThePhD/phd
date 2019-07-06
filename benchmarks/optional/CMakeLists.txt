@@ -9,7 +9,7 @@ add_subdirectory("${CMAKE_SOURCE_DIR}/vendor/optional" "vendor/optional")
 add_subdirectory("${CMAKE_SOURCE_DIR}/vendor/barrier" "vendor/barrier")
 
 # Source files
-set(phd_optional_benchmarks_sources
+set(phd.optional.benchmarks_sources
 	"source/references.cpp"
 	"source/values.cpp"
 	"source/references.transparent.cpp"
@@ -26,20 +26,24 @@ set(phd_optional_benchmarks_sources
 	"source/main.cpp"
 )
 
-prepend(phd_optional_benchmarks_sources "${CMAKE_CURRENT_SOURCE_DIR}/" ${phd_optional_benchmarks_sources})
+prepend(phd.optional.benchmarks_sources "${CMAKE_CURRENT_SOURCE_DIR}/" ${phd.optional.benchmarks_sources})
 
-add_executable(phd_optional_benchmarks ${phd_optional_benchmarks_sources})
+add_executable(phd.optional.benchmarks ${phd.optional.benchmarks_sources})
 if (MSVC)
-	target_compile_options(phd_optional_benchmarks
+	target_compile_options(phd.optional.benchmarks
 		PRIVATE /std:c++latest)
 else()
-	target_compile_options(phd_optional_benchmarks
-		PRIVATE -std=c++1z)
+	target_compile_options(phd.optional.benchmarks
+		PRIVATE -std=c++2a)
 endif()
-target_include_directories(phd_optional_benchmarks PRIVATE
+target_include_directories(phd.optional.benchmarks PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(phd_optional_benchmarks
-	PRIVATE optional benchmark barrier ${CMAKE_DL_LIBS}
+target_link_libraries(phd.optional.benchmarks
+	PRIVATE 
+	optional 
+	benchmark 
+	barrier 
+	${CMAKE_DL_LIBS}
 )
 
 set(PHD_OPTIONAL_BENCHMARKS_REPETITIONS 250
@@ -54,30 +58,30 @@ set(PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTDIR "${CMAKE_SOURCE_DIR}/benchmark_result
 set(PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE "${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTDIR}/optional_benchmarks_data.${PHD_OPTIONAL_BENCHMARKS_FORMAT}")
 file(MAKE_DIRECTORY "${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTDIR}")
 
-set(phd_optional_benchmarks_categories 
+set(phd.optional.benchmarks_categories 
 	int_3x_by,int_by,vector_by,vector_3x_by)
-set(phd_optional_benchmarks_category_names 
+set(phd.optional.benchmarks_category_names 
 	"int 3x" "int 1x" "vector 1x" "vector 3x")
 
-add_custom_target(phd_optional_benchmarks_runner
-	COMMAND phd_optional_benchmarks 
+add_custom_target(phd.optional.benchmarks_runner
+	COMMAND phd.optional.benchmarks 
 		"--benchmark_out=${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE}" 
 		"--benchmark_out_format=${PHD_OPTIONAL_BENCHMARKS_FORMAT}" 
 		"--benchmark_repetitions=${PHD_OPTIONAL_BENCHMARKS_REPETITIONS}"
-	DEPENDS phd_optional_benchmarks
+	DEPENDS phd.optional.benchmarks
 	BYPRODUCTS ${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE}
 	COMMENT "Executing Benchmarks and outputting to '${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE}'"
 )
 
 if (Python3_Interpreter_FOUND)
-	add_custom_target(phd_optional_benchmarks_graphs_generator
+	add_custom_target(phd.optional.benchmarks_graphs_generator
 		COMMAND ${Python3_EXECUTABLE} "${CMAKE_SOURCE_DIR}/benchmarks/tools/generate_graphs.py" 
 			"--input=${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE}"
 			"--input_format=${PHD_OPTIONAL_BENCHMARKS_FORMAT}"
 			"--output_dir=${PHD_OPTIONAL_BENCHMARKS_GRAPH_OUTDIR}"
-			"--categories=${phd_optional_benchmarks_categories}"
-			--category_names ${phd_optional_benchmarks_category_names}
-		DEPENDS phd_optional_benchmarks "${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE}"
+			"--categories=${phd.optional.benchmarks_categories}"
+			--category_names ${phd.optional.benchmarks_category_names}
+		DEPENDS phd.optional.benchmarks "${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE}"
 		COMMENT "Graphing '${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTFILE}' data to '${PHD_OPTIONAL_BENCHMARKS_RESULTS_OUTDIR}'"
 	)
 endif()

@@ -29,7 +29,7 @@ foreach (example_source_name ${phd.out_ptr.example_sources})
 	target_compile_definitions(${example_target} PRIVATE __STDC_WANT_LIB_EXT1__=1)
 	target_link_libraries(${example_target}
 		PRIVATE 
-		
+		phd::phd
 		Threads::Threads
 		ficapi
 		${CMAKE_DL_LIBS}

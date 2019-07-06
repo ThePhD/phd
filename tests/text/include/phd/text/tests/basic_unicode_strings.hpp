@@ -15,13 +15,9 @@ namespace phd { namespace text { namespace tests {
 
 	inline constexpr const char32_t u32_ansi_sequence_truth[] = U"zá:iï";
 	inline constexpr const char16_t u16_ansi_sequence_truth[] = u"zá:iï";
-	inline constexpr const char8_t u8_ansi_sequence_truth[]   = u8"zá:iï";
+	inline constexpr const char8_t u8_ansi_sequence_truth[]   = u8"";
 	inline constexpr const wchar_t w_ansi_sequence_truth[]    = L"zá:iï";
-#ifdef _WIN32
-	inline constexpr const char ansi_sequence_truth[] = "z\xE1:i\xEF";
-#else
-	inline constexpr const char ansi_sequence_truth[] = "zá:iï";
-#endif
+	inline constexpr const char ansi_sequence_truth[]		   = "zá:iï";
 
 	inline constexpr const char32_t u32_unicode_single_truth[] = U"♥";
 	inline constexpr const char16_t u16_unicode_single_truth[] = u"♥";
@@ -32,11 +28,7 @@ namespace phd { namespace text { namespace tests {
 	inline constexpr const char16_t u16_ansi_single_truth[] = u"á";
 	inline constexpr const char8_t u8_ansi_single_truth[]   = u8"á";
 	inline constexpr const wchar_t w_ansi_single_truth[]    = L"á";
-#ifdef _WIN32
-	inline constexpr const char ansi_single_truth[] = "\xE1";
-#else
-	inline constexpr const char ansi_single_truth[]   = "á";
-#endif
+	inline constexpr const char ansi_single_truth[]		 = "á";
 
 	inline constexpr const char32_t u32_unicode_invalid_input[] = { 0xFFFFFFFF, 0 };
 	inline constexpr const char16_t u16_unicode_invalid_input[] = { 0xD800, 0 };

@@ -5,4 +5,4 @@
 
 #include <phd/handle/handle.hpp>
 
-#endif // PHD_HANDLE_HANDLE
+#endif // PHD_HANDLE_HPP

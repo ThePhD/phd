@@ -5,7 +5,7 @@
 #include <range/v3/core.hpp>
 #include <range/v3/span.hpp>
 
-#include <phd/tests/basic_unicode_strings.hpp>
+#include <phd/text/tests/basic_unicode_strings.hpp>
 
 #include <iostream>
 
@@ -75,7 +75,7 @@ TEST_CASE("text/encoding/errors", "invalid characters are handled") {
 				auto result0 = enc.encode(phd::u32c_string_view(phd::text::tests::u32_unicode_invalid_input), ranges::span(output0, encode_output_max), s0, phd::default_text_error_handler{});
 				REQUIRE(result0.error_code == phd::encoding_errc::ok);
 				REQUIRE_FALSE(result0.error());
-				REQUIRE(phd::u32c_string_view(output0) == phd::tests::u32_unicode_replacement_truth);
+				REQUIRE(phd::u32c_string_view(output0) == phd::text::tests::u32_unicode_replacement_truth);
 			}
 		}
 	}

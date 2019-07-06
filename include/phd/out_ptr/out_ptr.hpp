@@ -18,8 +18,8 @@ namespace phd { namespace out_ptr {
 	namespace detail {
 
 #if defined(PHD_OUT_PTR_USE_CLEVER_OUT_PTR) && PHD_OUT_PTR_USE_CLEVER_OUT_PTR != 0
-		// One must opt into this specifically because it is unsafe for a large
-		// variety of APIs
+		// One must opt into this specifically because it is unsafe for
+		// a subsection of APIs in common circulation
 		template <typename Smart, typename Pointer, typename... Args>
 		using core_out_ptr_t = clever_out_ptr_t<Smart, Pointer, Args...>;
 #else

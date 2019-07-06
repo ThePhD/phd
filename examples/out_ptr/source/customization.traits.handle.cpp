@@ -6,7 +6,6 @@
 #include <ficapi/ficapi.hpp>
 
 #include <phd/out_ptr.hpp>
-#include <phd/mp11/integer_sequence.hpp>
 
 #include <assert.hpp>
 
@@ -59,7 +58,7 @@ namespace phd { namespace out_ptr {
 			return state.target;
 		}
 
-		static void reset(Smart& s, pointer& state) noexcept {
+		static void reset(Smart&, pointer&) noexcept {
 			// value already written directly into the pointer
 		}
 	};
@@ -67,7 +66,7 @@ namespace phd { namespace out_ptr {
 
 int main() {
 	phd::handle<int*, ficapi::int_deleter> p(nullptr);
-	ficapi_re_create(boost::out_ptr::inout_ptr<void*>(p), ficapi_type::ficapi_type_int);
+	ficapi_re_create(phd::out_ptr::inout_ptr<void*>(p), ficapi_type::ficapi_type_int);
 	int* rawp = static_cast<int*>(p.get());
 
 	OUT_PTR_C_ASSERT(rawp != nullptr);
