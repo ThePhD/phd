@@ -39,7 +39,7 @@ namespace detail {
 
 	private:
 		using can_aliasing_optimization = std::integral_constant<bool,
-			sizeof(Smart) <= sizeof(Pointer) && sizeof(std::unique_ptr<T, D>) <= sizeof(source_pointer)>;
+			sizeof(Smart) <= sizeof(Pointer) && sizeof(Smart) <= sizeof(source_pointer)>;
 		Smart* m_smart_ptr;
 		source_pointer m_old_ptr;
 		Pointer* m_target_ptr;
