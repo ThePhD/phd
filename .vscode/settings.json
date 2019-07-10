@@ -1,6 +1,6 @@
 {
 	"python.formatting.provider": "yapf",
-	"python.pythonPath": "C:\\Python37\\python.exe",
+	"python.pythonPath": "C:\\Program Files\\Python37\\python.exe",
 	"files.associations": {
 		"*.latex": "latex",
 		"xtr1common": "cpp",
@@ -83,7 +83,10 @@
 		"unordered_set": "cpp",
 		"cuchar": "cpp",
 		"clocale": "cpp",
-		"*.tcc": "cpp"
+		"*.tcc": "cpp",
+		"future": "cpp",
+		"resumable": "cpp",
+		"cwctype": "cpp"
 	},
 	"cmake.autoRestartBuild": true,
 	"cmake.saveBeforeBuild": true,
@@ -98,5 +101,4 @@
 	"python.linting.pylintEnabled": false,
 	"python.linting.mypyEnabled": true,
 	"python.linting.enabled": true,
-	"C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
 }

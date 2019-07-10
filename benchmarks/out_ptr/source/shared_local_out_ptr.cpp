@@ -3,6 +3,7 @@
 #include <benchmark/benchmark.h>
 
 #include <phd/out_ptr/out_ptr.hpp>
+#include <phd/out_ptr/noexcept_out_ptr.hpp>
 
 #include <ficapi/ficapi.hpp>
 
@@ -28,6 +29,12 @@ std::shared_ptr<ficapi::opaque> shared_allocate() {
 std::shared_ptr<ficapi::opaque> out_ptr_shared_allocate() {
 	std::shared_ptr<ficapi::opaque> p(nullptr);
 	ficapi_handle_no_alloc_create(phd::out_ptr::out_ptr(p, ficapi::handle_no_alloc_deleter()));
+	return p;
+}
+
+std::shared_ptr<ficapi::opaque> noexcept_out_ptr_shared_allocate() {
+	std::shared_ptr<ficapi::opaque> p(nullptr);
+	ficapi_handle_no_alloc_create(phd::out_ptr::detail::noexcept_out_ptr(p, ficapi::handle_no_alloc_deleter()));
 	return p;
 }
 
@@ -129,7 +136,7 @@ static void inline_out_ptr_shared_local_out_ptr(benchmark::State& state) {
 	int64_t x = 0;
 	for (auto _ : state) {
 		std::shared_ptr<ficapi::opaque> p(nullptr, ficapi::handle_no_alloc_deleter());
-		ficapi_handle_no_alloc_create(phd::out_ptr::detail::clever_out_ptr(p, ficapi::handle_no_alloc_deleter()));
+		ficapi_handle_no_alloc_create(phd::out_ptr::out_ptr(p, ficapi::handle_no_alloc_deleter()));
 		x += ficapi_handle_get_data(p.get());
 	}
 	int64_t expected = int64_t(state.iterations()) * ficapi_get_data();
@@ -139,6 +146,41 @@ static void inline_out_ptr_shared_local_out_ptr(benchmark::State& state) {
 	}
 }
 BENCHMARK(inline_out_ptr_shared_local_out_ptr)
+	->ComputeStatistics("max", &compute_max)
+	->ComputeStatistics("min", &compute_min)
+	->ComputeStatistics("dispersion", &compute_index_of_dispersion);
+
+static void noexcept_return_out_ptr_shared_local_out_ptr(benchmark::State& state) {
+	int64_t x = 0;
+	for (auto _ : state) {
+		std::shared_ptr<ficapi::opaque> p = noexcept_out_ptr_shared_allocate();
+		x += ficapi_handle_get_data(p.get());
+	}
+	int64_t expected = int64_t(state.iterations()) * ficapi_get_data();
+	if (x != expected) {
+		state.SkipWithError("Unexpected result");
+		return;
+	}
+}
+BENCHMARK(noexcept_return_out_ptr_shared_local_out_ptr)
+	->ComputeStatistics("max", &compute_max)
+	->ComputeStatistics("min", &compute_min)
+	->ComputeStatistics("dispersion", &compute_index_of_dispersion);
+
+static void noexcept_inline_out_ptr_shared_local_out_ptr(benchmark::State& state) {
+	int64_t x = 0;
+	for (auto _ : state) {
+		std::shared_ptr<ficapi::opaque> p(nullptr, ficapi::handle_no_alloc_deleter());
+		ficapi_handle_no_alloc_create(phd::out_ptr::detail::noexcept_out_ptr(p, ficapi::handle_no_alloc_deleter()));
+		x += ficapi_handle_get_data(p.get());
+	}
+	int64_t expected = int64_t(state.iterations()) * ficapi_get_data();
+	if (x != expected) {
+		state.SkipWithError("Unexpected result");
+		return;
+	}
+}
+BENCHMARK(noexcept_inline_out_ptr_shared_local_out_ptr)
 	->ComputeStatistics("max", &compute_max)
 	->ComputeStatistics("min", &compute_min)
 	->ComputeStatistics("dispersion", &compute_index_of_dispersion);
