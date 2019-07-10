@@ -1,3 +1,4 @@
 build/
 .vscode/ipch/
 .mypy_cache/
+.vscode/c_cpp_properties.json
