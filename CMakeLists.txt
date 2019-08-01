@@ -53,6 +53,11 @@ option(PHD_EXAMPLES "Enable build of examples" OFF)
 option(PHD_BENCHMARKS "Enable build of benchmarks" OFF)
 
 # # Targets
+
+# # # Sub-targets
+add_subdirectory(out_ptr)
+add_subdirectory(handle)
+
 set(phd_sources 
 	"include/phd/phd.hpp"
 )
@@ -63,6 +68,10 @@ add_library(phd::phd ALIAS phd)
 target_include_directories(phd INTERFACE 
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  
 	$<INSTALL_INTERFACE:include>
+)
+target_link_libraries(phd INTERFACE 
+	phd::out_ptr
+	phd::handle
 )
 target_include_directories(phd INTERFACE 
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/range-v3/include>  
@@ -82,10 +91,10 @@ target_sources(phd INTERFACE
 	$<BUILD_INTERFACE:${prefixed_phd_sources}>  
 	$<INSTALL_INTERFACE:${phd_sources}>
 )
-set_target_properties(phd
-	PROPERTIES
-	EXPORT_NAME phd::phd
-)
+#set_target_properties(phd
+#	PROPERTIES
+#	EXPORT_NAME phd::phd
+#)
 
 # # Benchmarks, Tests, Examples
 if (PHD_TESTS OR PHD_BENCHMARKS)
@@ -117,17 +126,17 @@ write_basic_package_version_file(
 
 export(TARGETS phd FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/phd/phd-targets.cmake")
 
-install(TARGETS phd
-	EXPORT phd)
+#install(TARGETS phd
+#	EXPORT phd)
 
-install(EXPORT phd
-	FILE phd-targets.cmake
-	DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/phd/phd")
+#install(EXPORT phd
+#	FILE phd-targets.cmake
+#	DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/phd/phd")
 
-install(DIRECTORY "include/phd/phd"
-	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+#install(DIRECTORY "include/phd/phd"
+#	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
-install(FILES
-	"${CMAKE_CURRENT_BINARY_DIR}/cmake/phd/phd-config.cmake"
-	"${CMAKE_CURRENT_BINARY_DIR}/cmake/phd/phd-config-version.cmake"
-DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/phd")
+#install(FILES
+#	"${CMAKE_CURRENT_BINARY_DIR}/cmake/phd/phd-config.cmake"
+#	"${CMAKE_CURRENT_BINARY_DIR}/cmake/phd/phd-config-version.cmake"
+#DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/phd")
