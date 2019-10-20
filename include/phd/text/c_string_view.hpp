@@ -20,7 +20,7 @@ namespace phd {
 		constexpr inline c_string_view operator"" _csv(const char* str_, size_t len_) noexcept {
 			return c_string_view(str_, len_);
 		}
-#if defined(__cpp_char_8t)
+#if defined(__cpp_char8_t)
 		constexpr inline u8c_string_view operator"" _csv(const char8_t* str_, size_t len_) noexcept {
 			return u8c_string_view(str_, len_);
 		}
