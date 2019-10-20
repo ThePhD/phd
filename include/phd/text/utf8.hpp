@@ -195,19 +195,18 @@ namespace phd {
 					}
 				}
 
-				code_point __decoded;
-				switch (length) {
-				case 2:
-					__decoded = __unicode_detail::__decode(b[0], b[1]);
-					break;
-				case 3:
-					__decoded = __unicode_detail::__decode(b[0], b[1], b[2]);
-					break;
-				case 4:
-				default:
-					__decoded = __unicode_detail::__decode(b[0], b[1], b[2], b[3]);
-					break;
-				}
+				code_point __decoded = [&length, &b]() { // invoked inplace
+					switch (length) {
+					case 2:
+						return __unicode_detail::__decode(b[0], b[1]);
+					case 3:
+						return __unicode_detail::__decode(b[0], b[1], b[2]);
+					case 4:
+						[[fallthrough]];
+					default:
+						return __unicode_detail::__decode(b[0], b[1], b[2], b[3]);
+					}
+				}();
 
 				if constexpr (__call_error_handler) {
 					if constexpr (!__overlong_allowed) {
