@@ -1,7 +1,7 @@
 # # barrier��
 # The Kek License (KEK)
 
-# Copyright � 2018 ThePhD.
+# Copyright � 2018-2020 ThePhD.
 
 # kek
 

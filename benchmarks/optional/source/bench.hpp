@@ -1,4 +1,4 @@
-// Copyright � 2018 ThePhD
+// Copyright � 2018-2020 ThePhD
 
 #ifndef PHD_OPTIONAL_BENCHMARKS_BENCH_HPP
 #define PHD_OPTIONAL_BENCHMARKS_BENCH_HPP

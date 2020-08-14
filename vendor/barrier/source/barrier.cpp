@@ -1,11 +1,9 @@
-
-
 // barrier
 // The Kek License (KEK)
 
-// Copyright � 2018 ThePhD
+// Copyright � 2018-2020 ThePhD
 
-// kek
+// kek :3
 
 #include <barrier/barrier.hpp>
 #include <vector>
@@ -32,6 +30,15 @@ namespace barrier {
 
 	size_t pure_transform_int(size_t source) {
 		return source * 2;
+	}
+
+	size_t pure_write_int(size_t source) {
+		return source;
+	}
+
+	void write::operator()(std::size_t value) noexcept {
+		*target = value;
+		target++;
 	}
 
 } // namespace barrier

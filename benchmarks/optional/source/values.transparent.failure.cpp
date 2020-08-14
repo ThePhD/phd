@@ -1,4 +1,4 @@
-// Copyright � 2018 ThePhD
+// Copyright � 2018-2020 ThePhD
 
 #include "optional.hpp"
 #include "data.hpp"

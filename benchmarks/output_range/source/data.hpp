@@ -1,7 +1,7 @@
 // Copyright � 2018-2020 ThePhD
 
-#ifndef PHD_OPTIONAL_BENCHMARKS_LIMITS_HPP
-#define PHD_OPTIONAL_BENCHMARKS_LIMITS_HPP
+#ifndef PHD_OUTPUT_RANGE_BENCHMARKS_LIMITS_HPP
+#define PHD_OUTPUT_RANGE_BENCHMARKS_LIMITS_HPP
 
 #include <cstddef>
 #include <random>
@@ -16,4 +16,17 @@ std::default_random_engine& get_engine();
 
 std::vector<std::size_t> create_random_vector(std::size_t vec_size = vector_size);
 
-#endif // PHD_OPTIONAL_BENCHMARKS_LIMITS_HPP
+const std::vector<std::size_t>& get_constant_random_vector();
+
+namespace transparent {
+	struct write {
+		std::size_t* target;
+
+		inline void operator()(std::size_t value) noexcept {
+			*target = value;
+			target++;
+		}
+	};
+}
+
+#endif // PHD_OUTPUT_RANGE_BENCHMARKS_LIMITS_HPP

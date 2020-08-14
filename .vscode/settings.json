@@ -86,7 +86,11 @@
 		"*.tcc": "cpp",
 		"future": "cpp",
 		"resumable": "cpp",
-		"cwctype": "cpp"
+		"cwctype": "cpp",
+		"compare": "cpp",
+		"concepts": "cpp",
+		"coroutine": "cpp",
+		"span": "cpp"
 	},
 	"cmake.autoRestartBuild": true,
 	"cmake.saveBeforeBuild": true,

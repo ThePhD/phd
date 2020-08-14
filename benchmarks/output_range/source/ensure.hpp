@@ -1,7 +1,7 @@
 // Copyright � 2018-2020 ThePhD
 
-#ifndef PHD_OPTIONAL_BENCHMARKS_ENSURE_HPP
-#define PHD_OPTIONAL_BENCHMARKS_ENSURE_HPP
+#ifndef PHD_OUTPUT_RANGE_BENCHMARKS_ENSURE_HPP
+#define PHD_OUTPUT_RANGE_BENCHMARKS_ENSURE_HPP
 
 #include <benchmark/benchmark.h>
 
@@ -14,4 +14,4 @@ bool ensure(benchmark::State& state, Left&& l, Right&& r) {
 	return true;
 }
 
-#endif // PHD_OPTIONAL_BENCHMARKS_ENSURE_HPP
+#endif // PHD_OUTPUT_RANGE_BENCHMARKS_ENSURE_HPP

@@ -1,9 +1,9 @@
 // barrier
 // The Kek License (KEK)
 
-// Copyright � 2018 ThePhD
+// Copyright � 2018-2020 ThePhD
 
-// kek
+// kek :3
 
 #pragma once
 
@@ -44,6 +44,14 @@ namespace barrier {
 
 	PHD_BARRIER_API size_t pure_transform_int(size_t source);
 
+	PHD_BARRIER_API size_t pure_write_int(size_t source);
+
+	struct write {
+		std::size_t* target;
+
+		PHD_BARRIER_API void operator()(std::size_t value) noexcept;
+	};
+
 } // namespace barrier
 
 namespace transparent {
@@ -69,6 +77,19 @@ namespace transparent {
 	inline size_t pure_transform_int(size_t source) {
 		return source * 2;
 	}
+
+	inline size_t pure_write_int(size_t source) {
+		return source;
+	}
+
+	struct write {
+		std::size_t* target;
+
+		inline void operator()(std::size_t value) noexcept {
+			*target = value;
+			target++;
+		}
+	};
 
 } // namespace transparent
 

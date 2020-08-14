@@ -55,8 +55,7 @@ option(PHD_BENCHMARKS "Enable build of benchmarks" OFF)
 # # Targets
 
 # # # Sub-targets
-add_subdirectory(out_ptr)
-add_subdirectory(handle)
+# add_subdirectory(out_ptr)
 
 set(phd_sources 
 	"include/phd/phd.hpp"

@@ -1,13 +1,5 @@
 include(Common/core)
 
-# Subdirectory TL's optional
-set(OPTIONAL_ENABLE_TESTS OFF CACHE INTERNAL "Enable tests." FORCE)
-set(OPTIONAL_ENABLE_DOCS OFF CACHE INTERNAL "Enable documentation." FORCE)
-add_subdirectory("${CMAKE_SOURCE_DIR}/vendor/optional" "vendor/optional")
-
-# Subdirectory barrier
-add_subdirectory("${CMAKE_SOURCE_DIR}/vendor/barrier" "vendor/barrier")
-
 # Source files
 set(phd.optional.benchmarks_sources
 	"source/references.cpp"
