@@ -451,6 +451,7 @@ def main():
 	                    default=['real_time'])
 	parser.add_argument('-l', '--lower', nargs='+', default=['real_time'])
 	parser.add_argument('-c', '--categories', nargs='+', default=[])
+	parser.add_argument('-n', '--category_names', nargs='+', default=[])
 	parser.add_argument('-s', '--scale', nargs='?', type=int, default=1)
 	parser.add_argument('-t', '--scale_categories', nargs='+', default=[])
 	parser.add_argument('-r', '--remove_from_names', nargs='+', default=[''])

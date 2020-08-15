@@ -59,10 +59,7 @@ if (PHD_OUT_PTR)
 	add_subdirectory(out_ptr)
 endif()
 
-set(phd_sources 
-	"include/phd/phd.hpp"
-)
-prepend(prefixed_phd_sources "${CMAKE_CURRENT_SOURCE_DIR}/" ${phd_sources})
+file(GLOB_RECURSE phd_sources LIST_DIRECTORIES false RELATIVE "${CMAKE_SOURCE_DIR}" CONFIGURE_DEPENDS "include/*" "source/*")
 
 add_library(phd INTERFACE)
 add_library(phd::phd ALIAS phd)
@@ -75,10 +72,6 @@ if (TARGET phd::out_ptr)
 		phd::out_ptr
 	)
 endif()
-target_include_directories(phd INTERFACE 
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/range-v3/include>
-	$<INSTALL_INTERFACE:"">
-)
 if (MSVC)
 	target_compile_options(phd INTERFACE 
 		/std:c++latest
@@ -89,14 +82,9 @@ else()
 		-std=c++2a
 	)
 endif()
-target_sources(phd INTERFACE 
-	$<BUILD_INTERFACE:${prefixed_phd_sources}>
-	$<INSTALL_INTERFACE:${phd_sources}>
+target_sources(phd INTERFACE
+	$<BUILD_INTERFACE:${phd_sources}>
 )
-#set_target_properties(phd
-#	PROPERTIES
-#	EXPORT_NAME phd::phd
-#)
 
 # # Benchmarks, Tests, Examples
 if (PHD_TESTS OR PHD_BENCHMARKS)
