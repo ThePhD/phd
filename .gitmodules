@@ -13,9 +13,6 @@ url=https://github.com/google/benchmark.git
 [submodule "vendor/Catch2"]
 	path = vendor/Catch2
 	url = https://github.com/catchorg/Catch2.git
-[submodule "vendor/Catch2"]
-	path = vendor/Catch2
-	url = https://github.com/catchorg/Catch2.git
 [submodule "out_ptr"]
 	path = out_ptr
 	url = https://github.com/ThePhD/out_ptr
