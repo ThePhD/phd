@@ -13,8 +13,8 @@ url=https://github.com/google/benchmark.git
 [submodule "vendor/Catch2"]
 	path = vendor/Catch2
 	url = https://github.com/catchorg/Catch2.git
-[submodule "vendor/catch2"]
-	path = vendor/catch2
+[submodule "vendor/Catch2"]
+	path = vendor/Catch2
 	url = https://github.com/catchorg/Catch2.git
 [submodule "out_ptr"]
 	path = out_ptr
