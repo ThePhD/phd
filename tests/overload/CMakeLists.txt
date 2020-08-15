@@ -16,12 +16,12 @@ else()
 		PRIVATE -std=c++2a)
 endif()
 target_include_directories(phd.overload.test
-	PRIVATE 
+	PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(phd.overload.test 
-	PRIVATE 
-	phd::phd	
-	Catch2::Catch2 
+	PRIVATE
+	phd::phd
+	Catch2::Catch2
 	${CMAKE_DL_LIBS}
 )
 add_test(NAME phd.overload.test COMMAND phd.overload.test)

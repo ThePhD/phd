@@ -1,7 +1,5 @@
-# # phd 
-
-
-cmake_minimum_required(VERSION 3.12.0)
+# # phd
+cmake_minimum_required(VERSION 3.18.0)
 
 # # Project declaration
 # informs about the project, gives a description, version and MOST IMPORTANTLY
@@ -38,6 +36,8 @@ if (PHD_IS_TOP_LEVEL_PROJECT)
 		string(REGEX REPLACE "/W[0-4]" "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
 		string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 	endif()
+
+	include(FetchContent)
 endif()
 
 # # Include standard modules
@@ -55,7 +55,9 @@ option(PHD_BENCHMARKS "Enable build of benchmarks" OFF)
 # # Targets
 
 # # # Sub-targets
-# add_subdirectory(out_ptr)
+if (PHD_OUT_PTR)
+	add_subdirectory(out_ptr)
+endif()
 
 set(phd_sources 
 	"include/phd/phd.hpp"
@@ -65,15 +67,16 @@ prepend(prefixed_phd_sources "${CMAKE_CURRENT_SOURCE_DIR}/" ${phd_sources})
 add_library(phd INTERFACE)
 add_library(phd::phd ALIAS phd)
 target_include_directories(phd INTERFACE 
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:include>
 )
-target_link_libraries(phd INTERFACE 
-	phd::out_ptr
-	phd::handle
-)
+if (TARGET phd::out_ptr)
+	target_link_libraries(phd INTERFACE
+		phd::out_ptr
+	)
+endif()
 target_include_directories(phd INTERFACE 
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/range-v3/include>  
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/range-v3/include>
 	$<INSTALL_INTERFACE:"">
 )
 if (MSVC)
@@ -87,7 +90,7 @@ else()
 	)
 endif()
 target_sources(phd INTERFACE 
-	$<BUILD_INTERFACE:${prefixed_phd_sources}>  
+	$<BUILD_INTERFACE:${prefixed_phd_sources}>
 	$<INSTALL_INTERFACE:${phd_sources}>
 )
 #set_target_properties(phd
@@ -98,7 +101,9 @@ target_sources(phd INTERFACE
 # # Benchmarks, Tests, Examples
 if (PHD_TESTS OR PHD_BENCHMARKS)
 	enable_testing()
-	add_subdirectory(vendor/ficapi)
+	if (NOT TARGET ficapi::ficapi)
+		add_subdirectory(vendor/ficapi)
+	endif()
 endif()
 if (PHD_TESTS)
 	enable_testing()

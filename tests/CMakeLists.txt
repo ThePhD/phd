@@ -1,9 +1,14 @@
 # Dependencies
 if (NOT TARGET Catch2::Catch2)
-	add_subdirectory(../vendor/catch2 "vendor/Catch2")
+	FetchContent_Declare(
+		Catch2
+		GIT_REPOSITORY https://github.com/catchorg/Catch2
+	)
+	FetchContent_MakeAvailable(Catch2)
 endif()
 
 # Tests
 add_subdirectory(overload)
-add_subdirectory(text)
-add_subdirectory(handle)
+if (TARGET phd::out_ptr)
+	add_subdirectory(handle)
+endif()

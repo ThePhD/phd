@@ -4,7 +4,6 @@
 #include "data.hpp"
 #include "stats.hpp"
 #include "optional.hpp"
-#include "bench.hpp"
 
 #include <benchmark/benchmark.h>
 #include <barrier/barrier.hpp>

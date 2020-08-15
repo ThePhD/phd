@@ -1,12 +1,12 @@
 include(Common/core)
 
 # Source files
-file(GLOB phd.output_range.benchmarks_sources LIST_DIRECTORIES FALSE "source/*")
+file(GLOB phd.output_range.benchmark_sources LIST_DIRECTORIES FALSE "source/*")
 
 add_executable(phd.output_range.benchmarks ${phd.output_range.benchmark_sources})
 if (MSVC)
 	target_compile_options(phd.output_range.benchmarks
-		PRIVATE /std:c++latest)
+		PRIVATE /std:c++latest $<$<CONFIG:Release>:/Ob3>)
 else()
 	target_compile_options(phd.output_range.benchmarks
 		PRIVATE -std=c++2a)
